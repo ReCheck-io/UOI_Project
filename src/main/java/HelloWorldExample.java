@@ -10,6 +10,10 @@ import static org.neo4j.driver.Values.parameters;
 
 public class HelloWorldExample implements AutoCloseable
 {
+
+    /**
+     * The driver is needed to connect and do stuff with neo4j
+     */
     private final Driver driver;
 
     public HelloWorldExample( String uri, String user, String password )
@@ -45,7 +49,7 @@ public class HelloWorldExample implements AutoCloseable
 
     public static void main( String... args ) throws Exception
     {
-        try ( HelloWorldExample greeter = new HelloWorldExample( "bolt://localhost:7687", "neo4j", "password" ) )
+        try ( HelloWorldExample greeter = new HelloWorldExample( "bolt://localhost:7687", "neo4j", "test" ) )
         {
             greeter.printGreeting( "hello, world" );
         }
