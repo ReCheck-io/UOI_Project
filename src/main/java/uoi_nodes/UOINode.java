@@ -1,7 +1,12 @@
 package uoi_nodes;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 
+import java.util.*;
+
+@NodeEntity
 public class UOINode {
 
     String uuid;
@@ -9,16 +14,169 @@ public class UOINode {
     double height;
     double width;
     List materials;
-    List child;
-    String parent;
-    String physicalID;
+    List physicalID;
     String timestamp;
     String owner;
-    String borrower;
+    String tenant;
 
-    public UOINode(String uuid, String timestamp){
-        this.uuid = uuid;
+    @JsonIgnoreProperties("UOINode")
+    @Relationship("PART_OF")
+    String parent = new UOINode().getUuid();
+
+    @JsonIgnoreProperties("UOINode")
+    @Relationship("CONSISTS_OF")
+    List child = new List<UOINode>() {
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return false;
+        }
+
+        @Override
+        public Iterator<UOINode> iterator() {
+            return null;
+        }
+
+        @Override
+        public Object[] toArray() {
+            return new Object[0];
+        }
+
+        @Override
+        public <T> T[] toArray(T[] ts) {
+            return null;
+        }
+
+        @Override
+        public boolean add(UOINode uoiNode) {
+            return false;
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            return false;
+        }
+
+        @Override
+        public boolean containsAll(Collection<?> collection) {
+            return false;
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends UOINode> collection) {
+            return false;
+        }
+
+        @Override
+        public boolean addAll(int i, Collection<? extends UOINode> collection) {
+            return false;
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> collection) {
+            return false;
+        }
+
+        @Override
+        public boolean retainAll(Collection<?> collection) {
+            return false;
+        }
+
+        @Override
+        public void clear() {
+
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return 0;
+        }
+
+        @Override
+        public UOINode get(int i) {
+            return null;
+        }
+
+        @Override
+        public UOINode set(int i, UOINode uoiNode) {
+            return null;
+        }
+
+        @Override
+        public void add(int i, UOINode uoiNode) {
+
+        }
+
+        @Override
+        public UOINode remove(int i) {
+            return null;
+        }
+
+        @Override
+        public int indexOf(Object o) {
+            return 0;
+        }
+
+        @Override
+        public int lastIndexOf(Object o) {
+            return 0;
+        }
+
+        @Override
+        public ListIterator<UOINode> listIterator() {
+            return null;
+        }
+
+        @Override
+        public ListIterator<UOINode> listIterator(int i) {
+            return null;
+        }
+
+        @Override
+        public List<UOINode> subList(int i, int i1) {
+            return null;
+        }
+    };
+
+    @JsonIgnoreProperties("UOINode")
+    @Relationship("HISTORY_OF")
+    String historyUOI = new UOINode().getUuid();
+
+
+    // physicalID 1:1 UOI
+    // physicalID da e unique
+    // dali moje neo4j da tyrsi po partial string matching
+    // dali moje neo4j da tyrsi po List string matching
+    // da namerq UOI v koito PID e v spisyk
+
+
+    public UOINode(String parent, String timestamp) {
+        //parent
+        this.parent = parent;
+        this.uuid = "NL " + UUID.randomUUID();
         this.timestamp = timestamp;
+    }
+
+    public UOINode() {
+        this.uuid = "NL " + UUID.randomUUID();
+    }
+
+    public String getUuid() {
+        return uuid;
     }
 
     public double getLength() {
@@ -69,11 +227,11 @@ public class UOINode {
         this.parent = parent;
     }
 
-    public String getPhysicalID() {
+    public List getPhysicalID() {
         return physicalID;
     }
 
-    public void setPhysicalID(String physicalID) {
+    public void setPhysicalID(List physicalID) {
         this.physicalID = physicalID;
     }
 
@@ -93,12 +251,12 @@ public class UOINode {
         this.owner = owner;
     }
 
-    public String getBorrower() {
-        return borrower;
+    public String getTenant() {
+        return tenant;
     }
 
-    public void setBorrower(String borrower) {
-        this.borrower = borrower;
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 
 
