@@ -1,4 +1,4 @@
-package com.example.accessingdataneo4j;
+package uoi_project;
 
 import java.util.List;
 import org.springframework.data.neo4j.repository.Neo4jRepository;

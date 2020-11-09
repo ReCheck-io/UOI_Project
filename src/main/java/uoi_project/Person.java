@@ -1,4 +1,4 @@
-package com.example.accessingdataneo4j;
+package uoi_project;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -43,7 +43,7 @@ public class Person {
 
     public String toString() {
 
-        return this.name + "'s teammates => "
+        return this.name + "UOI in the work"
                 + Optional.ofNullable(this.teammates).orElse(
                 Collections.emptySet()).stream()
                 .map(Person::getName)
