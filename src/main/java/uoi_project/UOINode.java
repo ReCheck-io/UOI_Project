@@ -6,7 +6,6 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import java.sql.Timestamp;
 import java.util.*;
 
 // API search, create, validate
@@ -26,10 +25,11 @@ public class UOINode {
     private String timestamp;
     private String owner;
     private String tenant;
-    private String level;
+    private LEVEL level;
+    private String address;
 
     // unique building ID https://github.com/pnnl/buildingid
-    private String ubid;
+    private UBID ubid;
 
     //needed for beacons/chip
     private double longitude;
@@ -51,32 +51,35 @@ public class UOINode {
     @Relationship(type = "PART_OF", direction = Relationship.OUTGOING)
     private UOINode parent;
 
+    public void partOf(UOINode parent) {
+        setParent(parent);
+    }
+
     @JsonIgnoreProperties("UOINode")
     @Relationship(type = "CONSISTS_OF", direction = Relationship.OUTGOING)
     private List<UOINode> children = new ArrayList<>();
 
     @JsonIgnoreProperties("UOINode")
     @Relationship(type = "HISTORY_OF", direction = Relationship.OUTGOING)
-    private UOINode historyUOI;
+    private UOINode historyOf;
 
     public void historyOf(UOINode presentUOI) {
-        presentUOI.setHistoryUOI(this);
+        setHistoryOf(presentUOI);
     }
+
+
 
     public UOINode(UOINode parent) {
     }
 
-    public String getLevel() {
+    public LEVEL getLevel() {
         return level;
     }
 
-    public void setLevel(String level) {
+    public void setLevel(LEVEL level) {
         this.level = level;
     }
 
-    public void partOf(UOINode uoiNode) {
-        parent = new UOINode(uoiNode);
-    }
 
     public void consistsOf(UOINode childUOI) {
         if (this.getChildren() == null) {
@@ -87,10 +90,10 @@ public class UOINode {
     }
 
 
-    public UOINode(String level) {
+    public UOINode(LEVEL level) {
         this.uuid = "NL " + UUID.randomUUID();
         this.level = level;
-        this.timestamp = String.valueOf(new Timestamp(System.currentTimeMillis()));
+        this.timestamp = String.valueOf(new Date().getTime());
     }
 
     @Override
@@ -134,6 +137,14 @@ public class UOINode {
         this.length = length;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public double getHeight() {
         return height;
     }
@@ -142,11 +153,11 @@ public class UOINode {
         this.uuid = uuid;
     }
 
-    public String getUbid() {
+    public UBID getUbid() {
         return ubid;
     }
 
-    public void setUbid(String ubid) {
+    public void setUbid(UBID ubid) {
         this.ubid = ubid;
     }
 
@@ -218,11 +229,11 @@ public class UOINode {
         this.parent = parent;
     }
 
-    public UOINode getHistoryUOI() {
-        return historyUOI;
+    public UOINode getHistoryOf() {
+        return historyOf;
     }
 
-    public void setHistoryUOI(UOINode historyUOI) {
-        this.historyUOI = historyUOI;
+    public void setHistoryOf(UOINode historyOf) {
+        this.historyOf = historyOf;
     }
 }
