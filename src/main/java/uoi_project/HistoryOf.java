@@ -17,4 +17,7 @@ public class HistoryOf {
 
     @EndNode
     private UOINode uoiNode;
+
+    public HistoryOf(){}
+
 }

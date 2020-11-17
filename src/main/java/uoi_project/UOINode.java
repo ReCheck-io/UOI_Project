@@ -1,6 +1,7 @@
 package uoi_project;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.json.JSONObject;
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -29,7 +30,7 @@ public class UOINode {
     private String address;
 
     // unique building ID https://github.com/pnnl/buildingid
-    private UBID ubid;
+    private String ubid;
 
     //needed for beacons/chip
     private double longitude;
@@ -43,7 +44,7 @@ public class UOINode {
     public UOINode(UOINode parent, String timestamp) {
         //parent
         this.parent = new UOINode(parent);
-        this.uuid = "NL " + UUID.randomUUID();
+        this.uuid = "NL." + UUID.randomUUID();
         this.timestamp = timestamp;
     }
 
@@ -51,13 +52,34 @@ public class UOINode {
     @Relationship(type = "PART_OF", direction = Relationship.OUTGOING)
     private UOINode parent;
 
+    public UOINode(LEVEL level, double length, double height, double width, String owner, String tenant, String ubid, double longitude, double latitude) {
+        this.uuid = "NL." + UUID.randomUUID();
+        this.level = level;
+        this.timestamp = String.valueOf(new Date().getTime());
+        this.length = length;
+        this.height = height;
+        this.width = width;
+        this.owner = owner;
+        this.tenant = tenant;
+        this.ubid = ubid;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
     public void partOf(UOINode parent) {
         setParent(parent);
     }
 
     @JsonIgnoreProperties("UOINode")
     @Relationship(type = "CONSISTS_OF", direction = Relationship.OUTGOING)
-    private List<UOINode> children = new ArrayList<>();
+    private List<ConsistsOf> children = new ArrayList<>();
+
+    public void consistsOf(UOINode childUOI) {
+        if (this.getChildren() == null) {
+            this.setChildren(children);
+        }
+        this.getChildren().add(childUOI);
+    }
 
     @JsonIgnoreProperties("UOINode")
     @Relationship(type = "HISTORY_OF", direction = Relationship.OUTGOING)
@@ -66,8 +88,6 @@ public class UOINode {
     public void historyOf(UOINode presentUOI) {
         setHistoryOf(presentUOI);
     }
-
-
 
     public UOINode(UOINode parent) {
     }
@@ -81,24 +101,22 @@ public class UOINode {
     }
 
 
-    public void consistsOf(UOINode childUOI) {
-        if (this.getChildren() == null) {
-            this.setChildren(children);
-        }
-
-        this.getChildren().add(childUOI);
-    }
-
-
     public UOINode(LEVEL level) {
-        this.uuid = "NL " + UUID.randomUUID();
+        this.uuid = "NL." + UUID.randomUUID();
         this.level = level;
-        this.timestamp = String.valueOf(new Date().getTime());
+        this.timestamp = String.valueOf(new Date());
     }
 
     @Override
     public String toString() {
-        return this.uuid + "UOI in the work";
+        JSONObject js = new JSONObject();
+        js.put("uuid", this.uuid);
+        js.put("timestamp", this.timestamp);
+        js.put("level", this.level);
+        if (this.ubid != null) {
+            js.put("UBID", this.ubid);
+        }
+        return js.toString();
     }
 
     public double getLongitude() {
@@ -153,11 +171,11 @@ public class UOINode {
         this.uuid = uuid;
     }
 
-    public UBID getUbid() {
+    public String getUbid() {
         return ubid;
     }
 
-    public void setUbid(UBID ubid) {
+    public void setUbid(String ubid) {
         this.ubid = ubid;
     }
 
@@ -236,4 +254,6 @@ public class UOINode {
     public void setHistoryOf(UOINode historyOf) {
         this.historyOf = historyOf;
     }
+
+
 }

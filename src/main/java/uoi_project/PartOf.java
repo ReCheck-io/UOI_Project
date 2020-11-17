@@ -8,7 +8,22 @@ public class PartOf {
     @GeneratedValue
     private long id;
 
-    public PartOf(UOINode uoiNode, UOINode parent, String timestamp) {
+    String timestamp;
+
+    @StartNode
+    private UOINode uoiNodePartOf;
+
+    @EndNode
+    private UOINode parent;
+
+    public PartOf(UOINode uoiNodePartOf, UOINode parent, String timestamp) {
+        this.uoiNodePartOf = uoiNodePartOf;
+        this.parent = parent;
+        this.timestamp = timestamp;
+    }
+
+    public PartOf() {
+
     }
 
     public String getTimestamp() {
@@ -19,8 +34,6 @@ public class PartOf {
         this.timestamp = timestamp;
     }
 
-    String timestamp;
-
     public UOINode getParent() {
         return parent;
     }
@@ -29,8 +42,6 @@ public class PartOf {
         this.parent = parent;
     }
 
-    private UOINode parent;
-
     public UOINode getUoiNodePartOf() {
         return uoiNodePartOf;
     }
@@ -38,19 +49,5 @@ public class PartOf {
     public void setUoiNodePartOf(UOINode uoiNodePartOf) {
         this.uoiNodePartOf = uoiNodePartOf;
     }
-
-    public UOINode getUoiNode() {
-        return uoiNode;
-    }
-
-    public void setUoiNode(UOINode uoiNode) {
-        this.uoiNode = uoiNode;
-    }
-
-    @StartNode
-    private UOINode uoiNodePartOf;
-
-    @EndNode
-    private UOINode uoiNode;
 
 }

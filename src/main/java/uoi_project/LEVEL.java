@@ -8,9 +8,4 @@ public enum LEVEL {
     WALL,
     ELEMENT,
     PRODUCT_SAMPLE,
-    PEPI,
-    GREG,
-    DAKA,
-    ROY,
-    EMO,
 }
