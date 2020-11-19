@@ -3,9 +3,10 @@
 
 ## Road Map : 
 
-Creation of the uoi_nodes and storing it on the graph db till 23th
+- properly code all methods 
 
-browse and traverse (API)- till 30th
+- finish the APIs
+
 
 ## Tech Stack
 - Java - 1.8
