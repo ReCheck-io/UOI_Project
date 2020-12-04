@@ -1,8 +1,12 @@
 # UOI_Project
 
-# [Educational resources](./educational resources) 
+UOI - Unique object identifier, is an ID that would represent an element up to a whole building in an estate. You can learn more about it in the educational resources. 
 
+# [Educational resources](https://github.com/ReCheck-io/UOI_Project/eductaional_resources) 
 
+It is important that people get familiar with what is a UOI and why it is important. You can find a link with the problem found in the real estate and the solution this identificator is going to solve [by clicking right here](https://www.youtube.com/watch?v=aKcuLQ8Weyk). 
+
+[In the folder **educational_resources** you can find more information. Or by clicking here.](https://github.com/ReCheck-io/UOI_Project/eductaional_resources)
 
 ## Road Map : 
 
