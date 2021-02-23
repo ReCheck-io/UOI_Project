@@ -14,21 +14,24 @@ public class BaseInformationController {
     UOIRepository uoiRepository;
 
     @GetMapping("/new")
-    public UOINode generateNewUOI(@RequestParam(value = "level", defaultValue = "ROOM") LEVEL level) {
-//        double length = 3;
-//        double height = 3;
-//        double width = 0.5;
-//        String owner = "Odyssey";
-//        String tenant = "Momentum";
+    public UOINode generateNewUOI(@RequestParam(value = "countryCode", defaultValue = "NL") String countryCode, @RequestParam(value = "level", defaultValue = "ROOM") LEVEL level,@RequestParam(value = "uoiClass", defaultValue = "Shop") String uoiClass, @RequestParam(required = false) String parentUOI) throws Exception {
 
-//        // unique building ID https://github.com/pnnl/buildingid
-//        String ubid = "849VQJH6+97CVG-1279-797-1043-922";
-//
-//        //needed for beacons/chip
-//        double longitude = 0.000001;
-//        double latitude =0.000001953125;
+        UOINode node;
+        if (parentUOI != null){
+            UOINode parentNode = uoiRepository.findByUuid(parentUOI);
+            if (parentNode != null) {
+                node = new UOINode(countryCode, level, uoiClass, parentUOI);
+                uoiRepository.save(node);
 
-        UOINode node = new UOINode(level);
+                node.partOf(parentNode);
+                uoiRepository.save(node);
+                uoiRepository.save(parentNode);
+            }else {
+                throw new Exception("The node does not exist.");
+            }
+        }else {
+            node = new UOINode(countryCode, level, uoiClass);
+        }
 //        UOINode node = new UOINode(LEVEL.WALL,length, height, width, owner, tenant, ubid, longitude, latitude);
         uoiRepository.save(node);
         return node;
@@ -41,19 +44,6 @@ public class BaseInformationController {
         return node.toString();
     }
 
-    @GetMapping("/updateUBIDByGivenUOI")
-    public String updateUBID(@RequestParam(value = "uuid") String uuid, @RequestParam(value = "ubid") String ubid){
-        int nodePlace= 99999;
-        ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
-        for (int i=0; i<nodes.size();i++){
-            if (nodes.get(i).getUuid().equals(uuid)) {
-                nodePlace = i;
-            }
-        }
-        nodes.get(nodePlace).setUbid(ubid);
-        uoiRepository.saveAll(nodes);
-        return nodes.get(nodePlace).toString();
-    }
 
     @GetMapping("/getAllNodes")
     public String getAllNodes() {

@@ -7,7 +7,10 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 // API search, create, validate
 
@@ -18,27 +21,33 @@ public class UOINode {
     @GeneratedValue
     private Long id;
     private String uuid;
-    private double length;
-    private double height;
-    private double width;
-    private List materials;
-    private List physicalID;
+    private List properties;
     private String timestamp;
     private String owner;
-    private String tenant;
+
+
+    private String parentUOI;
+    private String uoiClass;
+    private String countryCode;
     private LEVEL level;
-    private String address;
-
-    // unique building ID https://github.com/pnnl/buildingid
-    private String ubid;
-
-    //needed for beacons/chip
-    private double longitude;
-    private double latitude;
-    private List resources;
 
     public UOINode() {
 
+    }
+
+    public UOINode( String countryCode, LEVEL level, String uoiClass) {
+        this.uuid = countryCode + "." + UUID.randomUUID();
+        this.level = level;
+        this.timestamp = String.valueOf(new Date().getTime());
+        this.uoiClass = uoiClass;
+    }
+
+    public UOINode( String countryCode, LEVEL level, String uoiClass, String parentUOI) {
+        this.uuid = countryCode + "." + UUID.randomUUID();
+        this.level = level;
+        this.timestamp = String.valueOf(new Date().getTime());
+        this.uoiClass = uoiClass;
+        this.parentUOI = parentUOI;
     }
 
     public UOINode(UOINode parent, String timestamp) {
@@ -56,18 +65,12 @@ public class UOINode {
         this.uuid = "NL." + UUID.randomUUID();
         this.level = level;
         this.timestamp = String.valueOf(new Date().getTime());
-        this.length = length;
-        this.height = height;
-        this.width = width;
         this.owner = owner;
-        this.tenant = tenant;
-        this.ubid = ubid;
-        this.latitude = latitude;
-        this.longitude = longitude;
     }
 
     public void partOf(UOINode parent) {
         setParent(parent);
+        setParentUOI(parent.getUuid());
     }
 
     @JsonIgnoreProperties("UOINode")
@@ -104,7 +107,7 @@ public class UOINode {
     public UOINode(LEVEL level) {
         this.uuid = "NL." + UUID.randomUUID();
         this.level = level;
-        this.timestamp = String.valueOf(new Date());
+        this.timestamp = String.valueOf(new Date().getTime());
     }
 
     @Override
@@ -113,90 +116,30 @@ public class UOINode {
         js.put("uuid", this.uuid);
         js.put("timestamp", this.timestamp);
         js.put("level", this.level);
-        if (this.ubid != null) {
-            js.put("UBID", this.ubid);
-        }
+        js.put("parentUOI", this.parentUOI);
+        js.put("parent", this.parent);
+        js.put("uoiClass", this.uoiClass);
+        js.put("properties", this.properties);
+        js.put("children", this.children);
+        js.put("historyOf", this.historyOf);
         return js.toString();
     }
 
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public List getResources() {
-        return resources;
-    }
-
-    public void setResources(List resources) {
-        this.resources = resources;
-    }
 
     public String getUuid() {
         return uuid;
-    }
-
-    public double getLength() {
-        return length;
-    }
-
-    public void setLength(double length) {
-        this.length = length;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public double getHeight() {
-        return height;
     }
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 
-    public String getUbid() {
-        return ubid;
+    public List getProperties() {
+        return properties;
     }
 
-    public void setUbid(String ubid) {
-        this.ubid = ubid;
-    }
-
-    public void setHeight(double height) {
-        this.height = height;
-    }
-
-    public double getWidth() {
-        return width;
-    }
-
-    public void setWidth(double width) {
-        this.width = width;
-    }
-
-    public List getMaterials() {
-        return materials;
-    }
-
-    public void setMaterials(List materials) {
-        this.materials = materials;
+    public void setProperties(List properties) {
+        this.properties = properties;
     }
 
     public List getChildren() {
@@ -205,14 +148,6 @@ public class UOINode {
 
     public void setChildren(List children) {
         this.children = children;
-    }
-
-    public List getPhysicalID() {
-        return physicalID;
-    }
-
-    public void setPhysicalID(List physicalID) {
-        this.physicalID = physicalID;
     }
 
     public String getTimestamp() {
@@ -231,12 +166,12 @@ public class UOINode {
         this.owner = owner;
     }
 
-    public String getTenant() {
-        return tenant;
+    public String getParentUOI() {
+        return parentUOI;
     }
 
-    public void setTenant(String tenant) {
-        this.tenant = tenant;
+    public void setParentUOI(String parentUOI) {
+        this.parentUOI = parentUOI;
     }
 
     public UOINode getParent() {
