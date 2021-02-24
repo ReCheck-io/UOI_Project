@@ -26,7 +26,7 @@ public class UOINode {
     private String owner;
 
 
-    private String parentUOI;
+    private String parentUOI = null;
     private String uoiClass;
     private String countryCode;
     private LEVEL level;
@@ -35,14 +35,14 @@ public class UOINode {
 
     }
 
-    public UOINode( String countryCode, LEVEL level, String uoiClass) {
+    public UOINode(String countryCode, LEVEL level, String uoiClass) {
         this.uuid = countryCode + "." + UUID.randomUUID();
         this.level = level;
         this.timestamp = String.valueOf(new Date().getTime());
         this.uoiClass = uoiClass;
     }
 
-    public UOINode( String countryCode, LEVEL level, String uoiClass, String parentUOI) {
+    public UOINode(String countryCode, LEVEL level, String uoiClass, String parentUOI) {
         this.uuid = countryCode + "." + UUID.randomUUID();
         this.level = level;
         this.timestamp = String.valueOf(new Date().getTime());
@@ -59,7 +59,7 @@ public class UOINode {
 
     @JsonIgnoreProperties("UOINode")
     @Relationship(type = "PART_OF", direction = Relationship.OUTGOING)
-    private UOINode parent;
+    private UOINode parent = null;
 
     public UOINode(LEVEL level, double length, double height, double width, String owner, String tenant, String ubid, double longitude, double latitude) {
         this.uuid = "NL." + UUID.randomUUID();
@@ -86,7 +86,7 @@ public class UOINode {
 
     @JsonIgnoreProperties("UOINode")
     @Relationship(type = "HISTORY_OF", direction = Relationship.OUTGOING)
-    private UOINode historyOf;
+    private UOINode historyOf = null;
 
     public void historyOf(UOINode presentUOI) {
         setHistoryOf(presentUOI);
@@ -116,13 +116,29 @@ public class UOINode {
         js.put("uuid", this.uuid);
         js.put("timestamp", this.timestamp);
         js.put("level", this.level);
-        js.put("parentUOI", this.parentUOI);
+        if (this.parentUOI != null) {
+            js.put("parentUOI", this.parentUOI);
+        } else {
+            js.put("parentUOI", "null");
+        }
         js.put("parent", this.parent);
-        js.put("uoiClass", this.uoiClass);
+        if (this.uoiClass != null) {
+            js.put("uoiClass", this.uoiClass);
+        } else {
+            js.put("uoiClass", "null");
+        }
         js.put("properties", this.properties);
-        js.put("children", this.children);
-        js.put("historyOf", this.historyOf);
-        return js.toString();
+        if (this.children != null){
+            js.put("children", this.children);
+        }else {
+            js.put("children", "null");
+        }   if (this.historyOf != null){
+            js.put("historyOf", this.historyOf);
+        }else {
+            js.put("historyOf", "null");
+        }
+        String res = js.toString().replaceAll("\\\\", "");
+        return res;
     }
 
 

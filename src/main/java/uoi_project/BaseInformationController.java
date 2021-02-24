@@ -13,9 +13,9 @@ public class BaseInformationController {
     UOIRepository uoiRepository;
 
     @GetMapping("/new")
-    public Object generateNewUOI(@RequestParam(value = "countryCode", defaultValue = "NL") String countryCode, @RequestParam(value = "level", defaultValue = "ROOM") LEVEL level, @RequestParam(value = "uoiClass", defaultValue = "Shop") String uoiClass, @RequestParam(required = false) String parentUOI) throws Exception {
+    public String generateNewUOI(@RequestParam(value = "countryCode", defaultValue = "NL") String countryCode, @RequestParam(value = "level", defaultValue = "ROOM") LEVEL level, @RequestParam(value = "uoiClass", defaultValue = "Shop") String uoiClass, @RequestParam(required = false) String parentUOI) throws Exception {
 
-        UOINode node;
+        UOINode node = null;
         if (parentUOI != null) {
             try {
                 UOINode parentNode = uoiRepository.findByUuid(parentUOI);
@@ -26,13 +26,14 @@ public class BaseInformationController {
                 uoiRepository.save(node);
                 uoiRepository.save(parentNode);
             } catch (Exception e) {
-                return new String("This node is not found in the db.");
+//                return new String("This node is not found in the db.");
             }
         } else {
             node = new UOINode(countryCode, level, uoiClass);
         }
+        System.out.println(node.toString());
         uoiRepository.save(node);
-        return node;
+        return node.toString();
     }
 
     @GetMapping("/getNodeByUOI")
