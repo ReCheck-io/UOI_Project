@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 public class BaseInformationController {
@@ -14,25 +13,24 @@ public class BaseInformationController {
     UOIRepository uoiRepository;
 
     @GetMapping("/new")
-    public UOINode generateNewUOI(@RequestParam(value = "countryCode", defaultValue = "NL") String countryCode, @RequestParam(value = "level", defaultValue = "ROOM") LEVEL level,@RequestParam(value = "uoiClass", defaultValue = "Shop") String uoiClass, @RequestParam(required = false) String parentUOI) throws Exception {
+    public Object generateNewUOI(@RequestParam(value = "countryCode", defaultValue = "NL") String countryCode, @RequestParam(value = "level", defaultValue = "ROOM") LEVEL level, @RequestParam(value = "uoiClass", defaultValue = "Shop") String uoiClass, @RequestParam(required = false) String parentUOI) throws Exception {
 
         UOINode node;
-        if (parentUOI != null){
-            UOINode parentNode = uoiRepository.findByUuid(parentUOI);
-            if (parentNode != null) {
+        if (parentUOI != null) {
+            try {
+                UOINode parentNode = uoiRepository.findByUuid(parentUOI);
                 node = new UOINode(countryCode, level, uoiClass, parentUOI);
                 uoiRepository.save(node);
 
                 node.partOf(parentNode);
                 uoiRepository.save(node);
                 uoiRepository.save(parentNode);
-            }else {
-                throw new Exception("The node does not exist.");
+            } catch (Exception e) {
+                return new String("This node is not found in the db.");
             }
-        }else {
+        } else {
             node = new UOINode(countryCode, level, uoiClass);
         }
-//        UOINode node = new UOINode(LEVEL.WALL,length, height, width, owner, tenant, ubid, longitude, latitude);
         uoiRepository.save(node);
         return node;
     }
@@ -40,6 +38,10 @@ public class BaseInformationController {
     @GetMapping("/getNodeByUOI")
     public String getNodes(@RequestParam(value = "uuid") String uuid) {
         UOINode node = uoiRepository.findByUuid(uuid);
+        if (node.getParentUOI() != null) {
+            UOINode parentNode = uoiRepository.findByUuid(node.getParentUOI());
+            node.setParent(parentNode);
+        }
         System.out.println(node);
         return node.toString();
     }
@@ -133,7 +135,7 @@ public class BaseInformationController {
     }
 
     @GetMapping("/demoNodes")
-    public String executeDemoNode(){
+    public String executeDemoNode() {
         uoiRepository.deleteAll();
         demoNodes(uoiRepository);
         return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503104983629824/Untitled_Diagram1.png'/> " +
@@ -141,7 +143,7 @@ public class BaseInformationController {
     }
 
     @GetMapping("/scenarioCombine")
-    public String executeDemoNodeCombineTwoRooms(){
+    public String executeDemoNodeCombineTwoRooms() {
         uoiRepository.deleteAll();
         demoNodesCombineTwoRooms(uoiRepository);
         return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503102551064576/Untitled_Diagram3.png'/> " +
@@ -149,20 +151,20 @@ public class BaseInformationController {
     }
 
     @GetMapping("/clearDB")
-    public String clearDB(){
+    public String clearDB() {
         uoiRepository.deleteAll();
         return "DB has been cleared!";
     }
 
     @GetMapping("/")
-    public String error(){
+    public String error() {
         return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/675683560673509389/776827370161700874/addtext_com_MTAwMTI1MzExODY.jpg'/> " +
                 "</body></html>";
 
     }
 
     @GetMapping("/scenarioAddANewRoom")
-    public String executeDemoNodeAddANewRoom(){
+    public String executeDemoNodeAddANewRoom() {
         uoiRepository.deleteAll();
         demoNodesAddANewRoom(uoiRepository);
         return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503092572553226/Untitled_Diagram4.png'/> " +
@@ -170,7 +172,7 @@ public class BaseInformationController {
     }
 
 
-    public void demoNodes(UOIRepository uoiRepository){
+    public void demoNodes(UOIRepository uoiRepository) {
         List<UOINode> nodes = new ArrayList<UOINode>();
 
         //walls
@@ -250,7 +252,7 @@ public class BaseInformationController {
         uoiRepository.saveAll(nodes);
     }
 
-    public void demoNodesCombineTwoRooms(UOIRepository uoiRepository){
+    public void demoNodesCombineTwoRooms(UOIRepository uoiRepository) {
         List<UOINode> nodes = new ArrayList<UOINode>();
 
         //walls
@@ -332,7 +334,7 @@ public class BaseInformationController {
         uoiRepository.saveAll(nodes);
     }
 
-    public void demoNodesAddANewRoom(UOIRepository uoiRepository){
+    public void demoNodesAddANewRoom(UOIRepository uoiRepository) {
         List<UOINode> nodes = new ArrayList<UOINode>();
 
         //walls
