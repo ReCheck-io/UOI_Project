@@ -1,4 +1,4 @@
-package uoi_project;
+package uoi_project.uoi.entity;
 
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.GeneratedValue;

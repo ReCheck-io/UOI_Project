@@ -1,12 +1,9 @@
-package uoi_project;
+package uoi_project.uoi;
 
-import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.Collection;
-import java.util.List;
+import uoi_project.uoi.entity.UOINode;
 
 @Repository
 public interface UOIRepository extends Neo4jRepository<UOINode, Long> {
@@ -17,6 +14,6 @@ public interface UOIRepository extends Neo4jRepository<UOINode, Long> {
 
     void children(UOINode uoiNode);
 
-    UOINode findByUuid(@Param("uuid") String uuid);
+    UOINode findByUoi(@Param("uoi") String uoi);
 
 }

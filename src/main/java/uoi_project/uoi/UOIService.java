@@ -1,24 +1,27 @@
-package uoi_project;
+package uoi_project.uoi;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
+import uoi_project.uoi.entity.LEVEL;
+import uoi_project.uoi.entity.UOINode;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController
-public class BaseInformationController {
+@Service
+public class UOIService {
 
     @Autowired
     UOIRepository uoiRepository;
 
-    @GetMapping("/new")
-    public String generateNewUOI(@RequestParam(value = "countryCode", defaultValue = "NL") String countryCode, @RequestParam(value = "level", defaultValue = "ROOM") LEVEL level, @RequestParam(value = "uoiClass", defaultValue = "Shop") String uoiClass, @RequestParam(required = false) String parentUOI) throws Exception {
+    public String generateNewUOI(String countryCode, LEVEL level, String uoiClass, String parentUOI) throws Exception {
 
         UOINode node = null;
         if (parentUOI != null) {
             try {
-                UOINode parentNode = uoiRepository.findByUuid(parentUOI);
+                UOINode parentNode = uoiRepository.findByUoi(parentUOI);
                 node = new UOINode(countryCode, level, uoiClass, parentUOI);
                 uoiRepository.save(node);
 
@@ -36,143 +39,24 @@ public class BaseInformationController {
         return node.toString();
     }
 
-    @GetMapping("/getNodeByUOI")
-    public String getNodes(@RequestParam(value = "uuid") String uuid) {
-        UOINode node = uoiRepository.findByUuid(uuid);
+    //sys flag za metadanni i bez
+    public String search(String uoi) {
+        UOINode node = uoiRepository.findByUoi(uoi);
         if (node.getParentUOI() != null) {
-            UOINode parentNode = uoiRepository.findByUuid(node.getParentUOI());
+            UOINode parentNode = uoiRepository.findByUoi(node.getParentUOI());
             node.setParent(parentNode);
         }
         System.out.println(node);
         return node.toString();
     }
-
-
-    @GetMapping("/getAllNodes")
-    public String getAllNodes() {
-        ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
-        return nodes.toString();
+    public UOINode putProperties(String uoi, String key, String value){
+        // node nul?
+        // prop nul?
+        UOINode node = uoiRepository.findByUoi(uoi);
+        node.addMoreProperties(key,value);
+        uoiRepository.save(node);
+        return node;
     }
-
-    @GetMapping("/setNodeBePartOfAnotherNode")
-    public String nodePartOfAnother(@RequestParam(value = "uuid") String uuid, @RequestParam(value = "uuidPartOf") String uuidPartOf) {
-        int nodePlace = 999999999;
-        int nodePlacePartOf = 999999999;
-        ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
-        for (int i = 0; i < nodes.size(); i++) {
-            if (nodes.get(i).getUuid().equals(uuid)) {
-                nodePlace = i;
-            }
-            if (nodes.get(i).getUuid().equals(uuidPartOf)) {
-                nodePlacePartOf = i;
-            }
-        }
-        if (nodePlace < 99999999) {
-            if (nodePlacePartOf < 99999999) {
-                nodes.get(nodePlacePartOf).partOf(nodes.get(nodePlace));
-                uoiRepository.saveAll(nodes);
-            }
-        }
-        ArrayList<UOINode> usedNodes = new ArrayList();
-        usedNodes.add(nodes.get(nodePlacePartOf));
-        usedNodes.add(nodes.get(nodePlace));
-        return usedNodes.toString();
-    }
-
-    @GetMapping("/setNodeBeConsistedOfAnotherNode")
-    public String nodeConsistedOfAnother(@RequestParam(value = "uuid") String uuid, @RequestParam(value = "uuidConsistedOf") String uuidConsistedOf) {
-        int nodePlace = 999999999;
-        int nodePlaceConsistedOf = 999999999;
-        ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
-        for (int i = 0; i < nodes.size(); i++) {
-            if (nodes.get(i).getUuid().equals(uuidConsistedOf)) {
-                nodePlaceConsistedOf = i;
-            }
-            if (nodes.get(i).getUuid().equals(uuid)) {
-                nodePlace = i;
-            }
-        }
-        if (nodePlace < 99999999) {
-            if (nodePlaceConsistedOf < 99999999) {
-                nodes.get(nodePlace).consistsOf(nodes.get(nodePlaceConsistedOf));
-                uoiRepository.saveAll(nodes);
-            }
-        }
-        ArrayList<UOINode> usedNodes = new ArrayList();
-        usedNodes.add(nodes.get(nodePlaceConsistedOf));
-        usedNodes.add(nodes.get(nodePlace));
-        return usedNodes.toString();
-    }
-
-    @GetMapping("/setNodeBeHistoryOfAnotherNode")
-    public String nodeHistoryOfAnother(@RequestParam(value = "uuid") String uuid, @RequestParam(value = "uuidHistoryOf") String uuidHistoryOf) {
-        int nodePlace = 999999999;
-        int nodePlaceHistoryOf = 999999999;
-        ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
-        for (int i = 0; i < nodes.size(); i++) {
-            if (nodes.get(i).getUuid().equals(uuid)) {
-                nodePlace = i;
-            }
-            if (nodes.get(i).getUuid().equals(uuidHistoryOf)) {
-                nodePlaceHistoryOf = i;
-            }
-        }
-        if (nodePlace < 99999999) {
-            if (nodePlaceHistoryOf < 99999999) {
-                nodes.get(nodePlaceHistoryOf).historyOf(nodes.get(nodePlace));
-                uoiRepository.saveAll(nodes);
-            }
-        }
-        ArrayList<UOINode> usedNodes = new ArrayList();
-        usedNodes.add(nodes.get(nodePlaceHistoryOf));
-        usedNodes.add(nodes.get(nodePlace));
-        return usedNodes.toString();
-    }
-
-    @PostMapping(path = "/newWithInformation", consumes = "application/json", produces = "application/json")
-    public UOINode addMember(@RequestBody UOINode uoiNode) {
-        uoiRepository.save(uoiNode);
-        return uoiNode;
-    }
-
-    @GetMapping("/demoNodes")
-    public String executeDemoNode() {
-        uoiRepository.deleteAll();
-        demoNodes(uoiRepository);
-        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503104983629824/Untitled_Diagram1.png'/> " +
-                "</body></html>";
-    }
-
-    @GetMapping("/scenarioCombine")
-    public String executeDemoNodeCombineTwoRooms() {
-        uoiRepository.deleteAll();
-        demoNodesCombineTwoRooms(uoiRepository);
-        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503102551064576/Untitled_Diagram3.png'/> " +
-                "</body></html>";
-    }
-
-    @GetMapping("/clearDB")
-    public String clearDB() {
-        uoiRepository.deleteAll();
-        return "DB has been cleared!";
-    }
-
-    @GetMapping("/")
-    public String error() {
-        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/675683560673509389/776827370161700874/addtext_com_MTAwMTI1MzExODY.jpg'/> " +
-                "</body></html>";
-
-    }
-
-    @GetMapping("/scenarioAddANewRoom")
-    public String executeDemoNodeAddANewRoom() {
-        uoiRepository.deleteAll();
-        demoNodesAddANewRoom(uoiRepository);
-        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503092572553226/Untitled_Diagram4.png'/> " +
-                "</body></html>";
-    }
-
-
     public void demoNodes(UOIRepository uoiRepository) {
         List<UOINode> nodes = new ArrayList<UOINode>();
 

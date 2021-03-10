@@ -1,16 +1,11 @@
-package uoi_project;
+package uoi_project.uoi.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.json.JSONObject;
-import org.neo4j.ogm.annotation.GeneratedValue;
-import org.neo4j.ogm.annotation.Id;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.*;
+import org.neo4j.ogm.annotation.Properties;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 // API search, create, validate
 
@@ -20,8 +15,9 @@ public class UOINode {
     @Id
     @GeneratedValue
     private Long id;
-    private String uuid;
-    private List properties;
+    private String uoi;
+    @Properties
+    private Map<String, String> properties = new HashMap<>();
     private String timestamp;
     private String owner;
 
@@ -36,14 +32,14 @@ public class UOINode {
     }
 
     public UOINode(String countryCode, LEVEL level, String uoiClass) {
-        this.uuid = countryCode + "." + UUID.randomUUID();
+        this.uoi = countryCode + "." + UUID.randomUUID();
         this.level = level;
         this.timestamp = String.valueOf(new Date().getTime());
         this.uoiClass = uoiClass;
     }
 
     public UOINode(String countryCode, LEVEL level, String uoiClass, String parentUOI) {
-        this.uuid = countryCode + "." + UUID.randomUUID();
+        this.uoi = countryCode + "." + UUID.randomUUID();
         this.level = level;
         this.timestamp = String.valueOf(new Date().getTime());
         this.uoiClass = uoiClass;
@@ -53,7 +49,7 @@ public class UOINode {
     public UOINode(UOINode parent, String timestamp) {
         //parent
         this.parent = new UOINode(parent);
-        this.uuid = "NL." + UUID.randomUUID();
+        this.uoi = "NL." + UUID.randomUUID();
         this.timestamp = timestamp;
     }
 
@@ -61,8 +57,8 @@ public class UOINode {
     @Relationship(type = "PART_OF", direction = Relationship.OUTGOING)
     private UOINode parent = null;
 
-    public UOINode(LEVEL level, double length, double height, double width, String owner, String tenant, String ubid, double longitude, double latitude) {
-        this.uuid = "NL." + UUID.randomUUID();
+    public UOINode(LEVEL level, String owner) {
+        this.uoi = "NL." + UUID.randomUUID();
         this.level = level;
         this.timestamp = String.valueOf(new Date().getTime());
         this.owner = owner;
@@ -70,11 +66,12 @@ public class UOINode {
 
     public void partOf(UOINode parent) {
         setParent(parent);
-        setParentUOI(parent.getUuid());
+        setParentUOI(parent.getUoi());
     }
 
     @JsonIgnoreProperties("UOINode")
     @Relationship(type = "CONSISTS_OF", direction = Relationship.OUTGOING)
+    //TODO: da gi napravq da sa array sys strings
     private List<ConsistsOf> children = new ArrayList<>();
 
     public void consistsOf(UOINode childUOI) {
@@ -105,7 +102,7 @@ public class UOINode {
 
 
     public UOINode(LEVEL level) {
-        this.uuid = "NL." + UUID.randomUUID();
+        this.uoi = "NL." + UUID.randomUUID();
         this.level = level;
         this.timestamp = String.valueOf(new Date().getTime());
     }
@@ -113,7 +110,7 @@ public class UOINode {
     @Override
     public String toString() {
         JSONObject js = new JSONObject();
-        js.put("uuid", this.uuid);
+        js.put("uoi", this.uoi);
         js.put("timestamp", this.timestamp);
         js.put("level", this.level);
         if (this.parentUOI != null) {
@@ -142,20 +139,23 @@ public class UOINode {
     }
 
 
-    public String getUuid() {
-        return uuid;
+    public String getUoi() {
+        return uoi;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setUoi(String uoi) {
+        this.uoi = uoi;
     }
 
-    public List getProperties() {
+    public Map<String, String> getProperties() {
         return properties;
     }
 
-    public void setProperties(List properties) {
+    public void setProperties(Map properties) {
         this.properties = properties;
+    }
+    public void addMoreProperties(String key, String value){
+        this.properties.put(key, value);
     }
 
     public List getChildren() {

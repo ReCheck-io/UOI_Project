@@ -1,4 +1,4 @@
-package uoi_project;
+package uoi_project.uoi.entity;
 
 public enum LEVEL {
     BUILDING_BLOCK,
