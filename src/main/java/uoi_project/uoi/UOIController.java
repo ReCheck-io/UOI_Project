@@ -30,47 +30,54 @@ public class UOIController {
 
     @Operation(summary = "Search for a UOI node by UOI or property.")
     @GetMapping("/node")
-//    @RequestParam(value = "property", required = false) List properties
     public String getNodes(@RequestParam(value = "uoi") String uoi) {
         return service.search(uoi);
     }
 
     @Operation(summary = "adding properties to a node.")
     @PutMapping("/node/properties")
-    public UOINode getNodeByProperties(@RequestParam(value = "uoi") String uoi,
+    public UOINode putNodeProperties(@RequestParam(value = "uoi") String uoi,
                                       @RequestParam(value = "key") String key,
                                       @RequestParam(value = "value") String value) {
         return service.putProperties(uoi, key, value);
 
     }
 
+    //TODO: da go naimenuvam kakto trqbva
+    @GetMapping("/test")
+    public List getNodeByProps(@RequestParam(value = "key") String key,
+                                 @RequestParam(value = "value") String value,
+                                 @RequestParam(value = "withMetaData" , defaultValue = "false") boolean withMetaData){
+        return service.searchByProperties(key, value, withMetaData);
+    }
+
 
     //TODO: da napravq DTO s 2te id-ta i da se razpoznava tipa na vryzkata i da se napravi
-    @PutMapping("/node")
-    public String nodePartOfAnother(@RequestParam(value = "uoi") String uoi,
-                                    @RequestParam(value = "uoiPartOf") String uoiPartOf) {
-        int nodePlace = 999999999;
-        int nodePlacePartOf = 999999999;
-        ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
-        for (int i = 0; i < nodes.size(); i++) {
-            if (nodes.get(i).getUoi().equals(uoi)) {
-                nodePlace = i;
-            }
-            if (nodes.get(i).getUoi().equals(uoiPartOf)) {
-                nodePlacePartOf = i;
-            }
-        }
-        if (nodePlace < 99999999) {
-            if (nodePlacePartOf < 99999999) {
-                nodes.get(nodePlacePartOf).partOf(nodes.get(nodePlace));
-                uoiRepository.saveAll(nodes);
-            }
-        }
-        ArrayList<UOINode> usedNodes = new ArrayList();
-        usedNodes.add(nodes.get(nodePlacePartOf));
-        usedNodes.add(nodes.get(nodePlace));
-        return usedNodes.toString();
-    }
+//    @PutMapping("/node")
+//    public String nodePartOfAnother(@RequestParam(value = "uoi") String uoi,
+//                                    @RequestParam(value = "uoiPartOf") String uoiPartOf) {
+//        int nodePlace = 999999999;
+//        int nodePlacePartOf = 999999999;
+//        ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
+//        for (int i = 0; i < nodes.size(); i++) {
+//            if (nodes.get(i).getUoi().equals(uoi)) {
+//                nodePlace = i;
+//            }
+//            if (nodes.get(i).getUoi().equals(uoiPartOf)) {
+//                nodePlacePartOf = i;
+//            }
+//        }
+//        if (nodePlace < 99999999) {
+//            if (nodePlacePartOf < 99999999) {
+//                nodes.get(nodePlacePartOf).partOf(nodes.get(nodePlace));
+//                uoiRepository.saveAll(nodes);
+//            }
+//        }
+//        ArrayList<UOINode> usedNodes = new ArrayList();
+//        usedNodes.add(nodes.get(nodePlacePartOf));
+//        usedNodes.add(nodes.get(nodePlace));
+//        return usedNodes.toString();
+//    }
 
 //    //TODO: da se razkara i da byde obedineno s gornoto
 //    @GetMapping("/node")
@@ -163,7 +170,7 @@ public class UOIController {
     @GetMapping("/scenarioAddANewRoom")
     public String executeDemoNodeAddANewRoom() {
         uoiRepository.deleteAll();
-        service.demoNodesAddANewRoom(uoiRepository);
+//        service.demoNodesAddANewRoom(uoiRepository);
         return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503092572553226/Untitled_Diagram4.png'/> " +
                 "</body></html>";
     }

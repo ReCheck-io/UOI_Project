@@ -46,12 +46,6 @@ public class UOINode {
         this.parentUOI = parentUOI;
     }
 
-    public UOINode(UOINode parent, String timestamp) {
-        //parent
-        this.parent = new UOINode(parent);
-        this.uoi = "NL." + UUID.randomUUID();
-        this.timestamp = timestamp;
-    }
 
     @JsonIgnoreProperties("UOINode")
     @Relationship(type = "PART_OF", direction = Relationship.OUTGOING)
@@ -71,7 +65,7 @@ public class UOINode {
 
     @JsonIgnoreProperties("UOINode")
     @Relationship(type = "CONSISTS_OF", direction = Relationship.OUTGOING)
-    //TODO: da gi napravq da sa array sys strings
+    //TODO: da gi napravq da sa array sys strings inache se chupi programata
     private List<ConsistsOf> children = new ArrayList<>();
 
     public void consistsOf(UOINode childUOI) {
@@ -81,13 +75,13 @@ public class UOINode {
         this.getChildren().add(childUOI);
     }
 
-    @JsonIgnoreProperties("UOINode")
-    @Relationship(type = "HISTORY_OF", direction = Relationship.OUTGOING)
-    private UOINode historyOf = null;
+//    @JsonIgnoreProperties("UOINode")
+//    @Relationship(type = "HISTORY_OF", direction = Relationship.OUTGOING)
+//    private UOINode historyOf = null;
 
-    public void historyOf(UOINode presentUOI) {
-        setHistoryOf(presentUOI);
-    }
+//    public void historyOf(UOINode presentUOI) {
+//        setHistoryOf(presentUOI);
+//    }
 
     public UOINode(UOINode parent) {
     }
@@ -107,6 +101,7 @@ public class UOINode {
         this.timestamp = String.valueOf(new Date().getTime());
     }
 
+    //TODO: da go vryshtam po drug nachin
     @Override
     public String toString() {
         JSONObject js = new JSONObject();
@@ -118,22 +113,23 @@ public class UOINode {
         } else {
             js.put("parentUOI", "null");
         }
-        js.put("parent", this.parent);
+//        js.put("parent", this.parent);
         if (this.uoiClass != null) {
             js.put("uoiClass", this.uoiClass);
         } else {
             js.put("uoiClass", "null");
         }
         js.put("properties", this.properties);
-        if (this.children != null){
-            js.put("children", this.children);
-        }else {
-            js.put("children", "null");
-        }   if (this.historyOf != null){
-            js.put("historyOf", this.historyOf);
-        }else {
-            js.put("historyOf", "null");
-        }
+//        if (this.children != null){
+//            js.put("children", this.children);
+//        }else {
+        js.put("children", "null");
+//        }
+//           if (this.historyOf != null){
+//            js.put("historyOf", this.historyOf);
+//        }else {
+//            js.put("historyOf", "null");
+//        }
         String res = js.toString().replaceAll("\\\\", "");
         return res;
     }
@@ -197,14 +193,14 @@ public class UOINode {
     public void setParent(UOINode parent) {
         this.parent = parent;
     }
-
-    public UOINode getHistoryOf() {
-        return historyOf;
-    }
-
-    public void setHistoryOf(UOINode historyOf) {
-        this.historyOf = historyOf;
-    }
+//
+//    public UOINode getHistoryOf() {
+//        return historyOf;
+//    }
+//
+//    public void setHistoryOf(UOINode historyOf) {
+//        this.historyOf = historyOf;
+//    }
 
 
 }

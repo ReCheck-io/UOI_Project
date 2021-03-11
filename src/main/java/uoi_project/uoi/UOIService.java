@@ -1,9 +1,7 @@
 package uoi_project.uoi;
 
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import uoi_project.uoi.entity.LEVEL;
 import uoi_project.uoi.entity.UOINode;
 
@@ -29,7 +27,7 @@ public class UOIService {
                 uoiRepository.save(node);
                 uoiRepository.save(parentNode);
             } catch (Exception e) {
-//                return new String("This node is not found in the db.");
+                return new String("This node is not found in the db.");
             }
         } else {
             node = new UOINode(countryCode, level, uoiClass);
@@ -39,23 +37,52 @@ public class UOIService {
         return node.toString();
     }
 
-    //sys flag za metadanni i bez
+    //TODO: sys flag za metadanni i bez
     public String search(String uoi) {
         UOINode node = uoiRepository.findByUoi(uoi);
-        if (node.getParentUOI() != null) {
-            UOINode parentNode = uoiRepository.findByUoi(node.getParentUOI());
-            node.setParent(parentNode);
+        if (node != null) {
+            System.out.println(node);
+            return node.toString();
+        }else {
+            return "The node does not exist.";
         }
-        System.out.println(node);
-        return node.toString();
     }
-    public UOINode putProperties(String uoi, String key, String value){
-        // node nul?
-        // prop nul?
-        UOINode node = uoiRepository.findByUoi(uoi);
-        node.addMoreProperties(key,value);
-        uoiRepository.save(node);
-        return node;
+
+    public List searchByProperties(String key, String value, boolean withMetaData){
+        ArrayList<UOINode> result = new ArrayList();
+        ArrayList resultUOIOnly = new ArrayList();
+        ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
+        for (int i=0;i<nodes.size();i++){
+            UOINode node = nodes.get(i);
+            if (node.getProperties()!= null && !node.getProperties().isEmpty()) {
+                if (node.getProperties().containsKey(key)){
+                    if(node.getProperties().get(key).equals(value)){
+                        result.add(node);
+                        resultUOIOnly.add(node.getUoi());
+                    }
+                }
+            }
+        }
+
+//                System.out.println(node.getProperties());
+//                System.out.println(node.getUoi());
+//                System.out.println("key "+  node.getProperties().containsKey(key));
+//                System.out.println("za toz key " + key + " tva value " + node.getProperties().get(key));
+//                System.out.println("value " + node.getProperties().containsValue(value));
+//                System.out.println(node.getProperties().values());
+        if (withMetaData){
+            return result;
+        }else {
+            return resultUOIOnly;
+        }
+    }
+
+    public UOINode putProperties(String uoi, String key, String value) {
+            UOINode node = uoiRepository.findByUoi(uoi);
+            node.addMoreProperties(key,value);
+            uoiRepository.save(node);
+            return node;
+
     }
     public void demoNodes(UOIRepository uoiRepository) {
         List<UOINode> nodes = new ArrayList<UOINode>();
@@ -214,8 +241,8 @@ public class UOIService {
         uoiRepository.saveAll(nodes);
 
         //History of the rooms
-        room1.historyOf(roomCombined);
-        room2.historyOf(roomCombined);
+//        room1.historyOf(roomCombined);
+//        room2.historyOf(roomCombined);
         uoiRepository.saveAll(nodes);
     }
 
