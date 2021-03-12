@@ -23,6 +23,9 @@ public class UOINode {
 
 
     private String parentUOI = null;
+
+
+
     private String uoiClass;
     private String countryCode;
     private LEVEL level;
@@ -105,17 +108,17 @@ public class UOINode {
     @Override
     public String toString() {
         JSONObject js = new JSONObject();
-        js.put("uoi", this.uoi);
-        js.put("timestamp", this.timestamp);
-        js.put("level", this.level);
-        if (this.parentUOI != null) {
-            js.put("parentUOI", this.parentUOI);
+        js.put("uoi", getUoi());
+        js.put("timestamp", getTimestamp());
+        js.put("level", getLevel());
+        if (getParentUOI() != null) {
+            js.put("parentUOI", getParentUOI());
         } else {
             js.put("parentUOI", "null");
         }
-//        js.put("parent", this.parent);
-        if (this.uoiClass != null) {
-            js.put("uoiClass", this.uoiClass);
+        js.put("parent",this.parent);
+        if (getUoiClass() != null) {
+            js.put("uoiClass", getUoiClass());
         } else {
             js.put("uoiClass", "null");
         }
@@ -128,7 +131,7 @@ public class UOINode {
 //           if (this.historyOf != null){
 //            js.put("historyOf", this.historyOf);
 //        }else {
-//            js.put("historyOf", "null");
+            js.put("historyOf", "null");
 //        }
         String res = js.toString().replaceAll("\\\\", "");
         return res;
@@ -192,6 +195,13 @@ public class UOINode {
 
     public void setParent(UOINode parent) {
         this.parent = parent;
+    }
+    public String getUoiClass() {
+        return uoiClass;
+    }
+
+    public void setUoiClass(String uoiClass) {
+        this.uoiClass = uoiClass;
     }
 //
 //    public UOINode getHistoryOf() {

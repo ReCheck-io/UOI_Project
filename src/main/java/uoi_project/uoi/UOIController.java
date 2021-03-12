@@ -23,7 +23,7 @@ public class UOIController {
     @GetMapping("/new")
     public String generateNewUOI(@RequestParam(value = "countryCode", defaultValue = "NL") String countryCode,
                                  @RequestParam(value = "level", defaultValue = "ROOM") LEVEL level,
-                                 @RequestParam(value = "uoiClass", defaultValue = "Shop", required = false) String uoiClass,
+                                 @RequestParam(value = "uoiClass", required = false) String uoiClass,
                                  @RequestParam(value = "parentUOI", required = false) String parentUOI) throws Exception {
         return service.generateNewUOI(countryCode, level, uoiClass, parentUOI);
     }
