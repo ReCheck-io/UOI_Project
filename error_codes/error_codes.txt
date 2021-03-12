@@ -1,0 +1,10 @@
+Constructing the error codes:
+
+general-10 backend-2x client-30/3x
+
+{
+    STATUS: ERROR
+    code: 20-12-34
+    message: "Something went effy"
+}
+
