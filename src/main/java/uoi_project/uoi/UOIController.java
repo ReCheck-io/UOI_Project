@@ -23,13 +23,13 @@ public class UOIController {
     @GetMapping("/new")
     public String generateNewUOI(@RequestParam(value = "countryCode", defaultValue = "NL") String countryCode,
                                  @RequestParam(value = "level", defaultValue = "ROOM") LEVEL level,
-                                 @RequestParam(value = "uoiClass", defaultValue = "Shop") String uoiClass,
+                                 @RequestParam(value = "uoiClass", defaultValue = "Shop", required = false) String uoiClass,
                                  @RequestParam(value = "parentUOI", required = false) String parentUOI) throws Exception {
         return service.generateNewUOI(countryCode, level, uoiClass, parentUOI);
     }
 
     @Operation(summary = "Search for a UOI node by UOI or property.")
-    @GetMapping("/node")
+    @GetMapping("/search/uoi")
     public String getNodes(@RequestParam(value = "uoi") String uoi) {
         return service.search(uoi);
     }
@@ -44,7 +44,8 @@ public class UOIController {
     }
 
     //TODO: da go naimenuvam kakto trqbva
-    @GetMapping("/test")
+    @Operation(summary = "Search for UOI by existing properties.")
+    @GetMapping("/search/properties")
     public List getNodeByProps(@RequestParam(value = "key") String key,
                                  @RequestParam(value = "value") String value,
                                  @RequestParam(value = "withMetaData" , defaultValue = "false") boolean withMetaData){
