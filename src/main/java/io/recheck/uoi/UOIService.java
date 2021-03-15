@@ -1,5 +1,6 @@
 package io.recheck.uoi;
 
+import io.recheck.uoi.dto.UOIPutRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import io.recheck.uoi.entity.LEVEL;
@@ -76,9 +77,9 @@ public class UOIService {
         }
     }
 
-    public UOINode putProperties(String uoi, String key, String value) {
-            UOINode node = uoiRepository.findByUoi(uoi);
-            node.addMoreProperties(key,value);
+    public UOINode putProperties(UOIPutRequestDTO uoiPutRequestDTO) {
+            UOINode node = uoiRepository.findByUoi(uoiPutRequestDTO.getUoi());
+            node.addMoreProperties(uoiPutRequestDTO.getKey(),uoiPutRequestDTO.getValue());
             uoiRepository.save(node);
             return node;
 
