@@ -104,7 +104,6 @@ public class UOINode {
         this.timestamp = String.valueOf(new Date().getTime());
     }
 
-    //TODO: da go vryshtam po drug nachin
     @Override
     public String toString() {
         JSONObject js = new JSONObject();

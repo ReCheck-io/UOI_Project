@@ -37,7 +37,6 @@ public class UOIService {
         return node.toString();
     }
 
-    //TODO: sys flag za metadanni i bez
     public String search(String uoi) {
         UOINode node = uoiRepository.findByUoi(uoi);
         if (node != null) {

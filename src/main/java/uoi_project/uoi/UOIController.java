@@ -43,7 +43,6 @@ public class UOIController {
 
     }
 
-    //TODO: da go naimenuvam kakto trqbva
     @Operation(summary = "Search for UOI by existing properties.")
     @GetMapping("/search/properties")
     public List getNodeByProps(@RequestParam(value = "key") String key,

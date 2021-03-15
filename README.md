@@ -8,11 +8,13 @@ It is important that people get familiar with what is a UOI and why it is import
 
 [In the folder **educational_resources** you can find more information. Or by clicking here.](https://github.com/ReCheck-io/UOI_Project/tree/master/educational_resources)
 
+## ALPHA API: 
+- https://uoi.recheck.io/swagger-ui/index.html?configUrl=/api-docs/swagger-config
+
+
 ## Road Map : 
 
-- properly code all methods 
-
-- finish the APIs
+- creating a Graphical demo interface 
 
 
 ## Tech Stack
@@ -23,24 +25,37 @@ It is important that people get familiar with what is a UOI and why it is import
 ### uoi_nodes structure
  
  ``` {
- length: 
- height: 
- width:
- materials: {
-             }
- child:
- parent: 
- Physical ID (PID)
- Timestamp
- role
- owner
- history
- }
+    "uuid": "NL.dfb2d5f4-89e3-43b0-840d-7c1cc57aa014",
+    "timestamp": "1614179433096",
+    "owner": null,
+    "level": "BUILDING",
+    “parentUOI: “NL.f68d91e6-2a0d-4055-8a0f-bc90a6d939ab”,
+    "children": [],
+    "historyOf": null,
+    "uoiClass": "Shop",
+    "properties" : [
+        {"length": 0},
+        {"height": 0},
+        {"width": 0},
+        {"materials": null},
+        {"tenant": null},
+        {"address": null},
+        {"longitude": 0},
+        {"latitude": 0},
+        {"resources": null},        
+        {"BAG" : "123123213"},
+        {"Company Owner" : "Hello Inc"}, 
+        {"VAT" : "123123123213"}
+    ]
+}
+
 ```
 
 ### Relationships Structure
 
-- CONSISTS_OF / PART_OF
+- CONSISTS_OF - a UOI that consists of another UOI (Flat consists of Room)
+
+- PART_OF - a UOI that is part of another UOI (Room is part of Flat)
 ```
     {
         Timestamp: 
