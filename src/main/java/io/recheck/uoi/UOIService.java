@@ -1,9 +1,9 @@
-package uoi_project.uoi;
+package io.recheck.uoi;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uoi_project.uoi.entity.LEVEL;
-import uoi_project.uoi.entity.UOINode;
+import io.recheck.uoi.entity.LEVEL;
+import io.recheck.uoi.entity.UOINode;
 
 import java.util.ArrayList;
 import java.util.List;

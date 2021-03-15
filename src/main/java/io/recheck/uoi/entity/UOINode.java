@@ -1,4 +1,4 @@
-package uoi_project.uoi.entity;
+package io.recheck.uoi.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.json.JSONObject;

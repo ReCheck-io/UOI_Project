@@ -1,13 +1,11 @@
-package uoi_project.uoi;
+package io.recheck.uoi;
 
 import io.swagger.v3.oas.annotations.Operation;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import uoi_project.uoi.entity.LEVEL;
-import uoi_project.uoi.entity.UOINode;
+import io.recheck.uoi.entity.LEVEL;
+import io.recheck.uoi.entity.UOINode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
