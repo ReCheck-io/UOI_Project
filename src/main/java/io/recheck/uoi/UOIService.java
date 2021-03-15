@@ -1,5 +1,6 @@
 package io.recheck.uoi;
 
+import io.recheck.uoi.dto.UOIPutRequestDTO;
 import jdk.nashorn.api.scripting.JSObject;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,13 +86,13 @@ public class UOIService {
         }
     }
 
-    public String putProperties(String uoi, String key, String value) {
-            UOINode node = uoiRepository.findByUoi(uoi);
-            node.addMoreProperties(key.trim(),value.trim());
+    public UOINode putProperties(UOIPutRequestDTO uoiPutRequestDTO) {
+            UOINode node = uoiRepository.findByUoi(uoiPutRequestDTO.getUoi());
+            node.addMoreProperties(uoiPutRequestDTO.getKey().trim(),uoiPutRequestDTO.getValue().trim());
             uoiRepository.save(node);
-            return node.toString();
-
+            return node;
     }
+
     public void demoNodes(UOIRepository uoiRepository) {
         List<UOINode> nodes = new ArrayList<UOINode>();
 

@@ -1,5 +1,6 @@
 package io.recheck.uoi;
 
+import io.recheck.uoi.dto.UOIPutRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -34,11 +35,8 @@ public class UOIController {
 
     @Operation(summary = "adding properties to a node.")
     @PutMapping("/node/properties")
-    public String putNodeProperties(@RequestParam(value = "uoi") String uoi,
-                                      @RequestParam(value = "key") String key,
-                                      @RequestParam(value = "value") String value) {
-        return service.putProperties(uoi, key, value);
-
+    public UOINode putNodeProperties(@RequestBody UOIPutRequestDTO uoiPutRequestDTO) {
+        return service.putProperties(uoiPutRequestDTO);
     }
 
     @Operation(summary = "Search for UOI by existing properties.")
