@@ -34,7 +34,7 @@ public class UOIController {
 
     @Operation(summary = "adding properties to a node.")
     @PutMapping("/node/properties")
-    public UOINode putNodeProperties(@RequestParam(value = "uoi") String uoi,
+    public String putNodeProperties(@RequestParam(value = "uoi") String uoi,
                                       @RequestParam(value = "key") String key,
                                       @RequestParam(value = "value") String value) {
         return service.putProperties(uoi, key, value);
