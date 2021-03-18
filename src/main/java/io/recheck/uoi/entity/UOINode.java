@@ -112,25 +112,18 @@ public class UOINode {
         js.put("level", getLevel());
         if (getParentUOI() != null) {
             js.put("parentUOI", getParentUOI());
-        } else {
-            js.put("parentUOI", "null");
         }
-        js.put("parent",this.parent);
         if (getUoiClass() != null) {
             js.put("uoiClass", getUoiClass());
-        } else {
-            js.put("uoiClass", "null");
         }
-        js.put("properties", this.properties);
+        if(!this.properties.isEmpty()){
+            js.put("properties", this.properties);
+        }
 //        if (this.children != null){
 //            js.put("children", this.children);
-//        }else {
-        js.put("children", "null");
 //        }
-//           if (this.historyOf != null){
+//        if (this.historyOf != null){
 //            js.put("historyOf", this.historyOf);
-//        }else {
-            js.put("historyOf", "null");
 //        }
         String res = js.toString().replaceAll("\\\\", "");
         return res;
