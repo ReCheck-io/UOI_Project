@@ -1,6 +1,5 @@
 package io.recheck.uoi;
 
-import jdk.nashorn.api.scripting.JSObject;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,7 @@ public class UOIService {
     @Autowired
     UOIRepository uoiRepository;
 
-    public String generateNewUOI(String countryCode, LEVEL level, String uoiClass, String parentUOI) throws Exception {
+    public UOINode generateNewUOI(String countryCode, LEVEL level, String uoiClass, String parentUOI) throws Exception {
 
         UOINode node = null;
         if (parentUOI != null) {
@@ -29,54 +28,41 @@ public class UOIService {
                 uoiRepository.save(node);
                 uoiRepository.save(parentNode);
             } catch (Exception e) {
-                return new String("This node is not found in the db.");
+//                return new String("This node is not found in the db.");
             }
         } else {
             node = new UOINode(countryCode, level, uoiClass);
         }
         System.out.println(node.toString());
         uoiRepository.save(node);
-        return node.toString();
+        return node;
     }
 
-    public String search(String uoi) {
+    public Object search(String uoi) {
         UOINode node = uoiRepository.findByUoi(uoi);
         if (node != null) {
             System.out.println(node);
-            return node.toString();
+            return node;
         }else {
             return "The node does not exist.";
         }
     }
 
     public List searchByProperties(String key, String value, boolean withMetaData){
-        ArrayList<JSONObject> result = new ArrayList();
+        ArrayList<UOINode> result = new ArrayList();
         ArrayList<String> resultUOIOnly = new ArrayList();
-        JSONObject jsNode;
         ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
         for (int i=0;i<nodes.size();i++){
             UOINode node = nodes.get(i);
             if (node.getProperties()!= null && !node.getProperties().isEmpty()) {
                 if (node.getProperties().containsKey(key)){
                     if(node.getProperties().get(key).equals(value)){
-                        jsNode = new JSONObject(node.toString());
-                        System.out.println("-----");
-                        System.out.println(node.toString());
-                        System.out.println(jsNode.toString());
-                        System.out.println("-----");
-                        result.add(jsNode);
+                        result.add(node);
                         resultUOIOnly.add(node.getUoi());
                     }
                 }
             }
         }
-
-//                System.out.println(node.getProperties());
-//                System.out.println(node.getUoi());
-//                System.out.println("key "+  node.getProperties().containsKey(key));
-//                System.out.println("za toz key " + key + " tva value " + node.getProperties().get(key));
-//                System.out.println("value " + node.getProperties().containsValue(value));
-//                System.out.println(node.getProperties().values());
         if (withMetaData){
             System.out.println(result);
             return result;
@@ -85,11 +71,11 @@ public class UOIService {
         }
     }
 
-    public String putProperties(String uoi, String key, String value) {
+    public UOINode putProperties(String uoi, String key, String value) {
             UOINode node = uoiRepository.findByUoi(uoi);
             node.addMoreProperties(key.trim(),value.trim());
             uoiRepository.save(node);
-            return node.toString();
+            return node;
 
     }
     public void demoNodes(UOIRepository uoiRepository) {
