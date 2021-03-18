@@ -47,8 +47,8 @@ public class UOIController {
                                  @RequestParam(value = "value") String value,
                                  @RequestParam(value = "withMetaData" , defaultValue = "false") boolean withMetaData){
 
-        ArrayList r = (ArrayList) service.searchByProperties(key, value, withMetaData);
-        return r;
+        return (ArrayList) service.searchByProperties(key, value, withMetaData);
+
     }
 
 

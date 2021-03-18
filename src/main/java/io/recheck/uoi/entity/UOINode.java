@@ -19,9 +19,7 @@ public class UOINode {
     private Long id;
     private String uoi;
     @Properties
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Map<String, String> properties ;
-
+    private Map<String, String> properties = new HashMap();
     private String timestamp;
     private String owner;
     private String parentUOI = null;
@@ -104,12 +102,7 @@ public class UOINode {
     }
 
     public void addMoreProperties(String key, String value) {
-        if (this.properties != null){
-            this.properties.put(key, value);
-        }else {
-            this.properties = new HashMap();
-            this.properties.put(key, value);
-        }
+        this.properties.put(key, value);
     }
 
 //    @Override
