@@ -1,6 +1,7 @@
 package io.recheck.uoi.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.json.JSONObject;
 import org.neo4j.ogm.annotation.*;
 import org.neo4j.ogm.annotation.Properties;
@@ -10,6 +11,7 @@ import java.util.*;
 // API search, create, validate
 
 @NodeEntity
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class UOINode {
 
     @Id
@@ -17,15 +19,12 @@ public class UOINode {
     private Long id;
     private String uoi;
     @Properties
-    private Map<String, String> properties = new HashMap<>();
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Map<String, String> properties ;
+
     private String timestamp;
     private String owner;
-
-
     private String parentUOI = null;
-
-
-
     private String uoiClass;
     private String countryCode;
     private LEVEL level;
@@ -104,30 +103,39 @@ public class UOINode {
         this.timestamp = String.valueOf(new Date().getTime());
     }
 
-    @Override
-    public String toString() {
-        JSONObject js = new JSONObject();
-        js.put("uoi", getUoi());
-        js.put("timestamp", getTimestamp());
-        js.put("level", getLevel());
-        if (getParentUOI() != null) {
-            js.put("parentUOI", getParentUOI());
+    public void addMoreProperties(String key, String value) {
+        if (this.properties != null){
+            this.properties.put(key, value);
+        }else {
+            this.properties = new HashMap();
+            this.properties.put(key, value);
         }
-        if (getUoiClass() != null) {
-            js.put("uoiClass", getUoiClass());
-        }
-        if(!this.properties.isEmpty()){
-            js.put("properties", this.properties);
-        }
-//        if (this.children != null){
-//            js.put("children", this.children);
-//        }
-//        if (this.historyOf != null){
-//            js.put("historyOf", this.historyOf);
-//        }
-        String res = js.toString().replaceAll("\\\\", "");
-        return res;
     }
+
+//    @Override
+//    public String toString() {
+//        JSONObject js = new JSONObject();
+//        js.put("uoi", getUoi());
+//        js.put("timestamp", getTimestamp());
+//        js.put("level", getLevel());
+//        if (getParentUOI() != null) {
+//            js.put("parentUOI", getParentUOI());
+//        }
+//        if (getUoiClass() != null) {
+//            js.put("uoiClass", getUoiClass());
+//        }
+//        if (!this.properties.isEmpty()) {
+//            js.put("properties", this.properties);
+//        }
+////        if (this.children != null){
+////            js.put("children", this.children);
+////        }
+////        if (this.historyOf != null){
+////            js.put("historyOf", this.historyOf);
+////        }
+//        String res = js.toString().replaceAll("\\\\", "");
+//        return res;
+//    }
 
 
     public String getUoi() {
@@ -145,9 +153,7 @@ public class UOINode {
     public void setProperties(Map properties) {
         this.properties = properties;
     }
-    public void addMoreProperties(String key, String value){
-        this.properties.put(key, value);
-    }
+
 
     public List getChildren() {
         return children;
@@ -181,13 +187,14 @@ public class UOINode {
         this.parentUOI = parentUOI;
     }
 
-    public UOINode getParent() {
-        return parent;
-    }
+//    public UOINode getParent() {
+//        return parent;
+//    }
 
     public void setParent(UOINode parent) {
         this.parent = parent;
     }
+
     public String getUoiClass() {
         return uoiClass;
     }

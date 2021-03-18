@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import io.recheck.uoi.entity.LEVEL;
 import io.recheck.uoi.entity.UOINode;
 
-import java.util.List;
+import java.util.ArrayList;
 
 @RestController
 public class UOIController {
@@ -19,34 +19,36 @@ public class UOIController {
 
     @Operation(summary = "Creating a new basic UOI without metadata.")
     @GetMapping("/new")
-    public String generateNewUOI(@RequestParam(value = "countryCode", defaultValue = "NL") String countryCode,
-                                 @RequestParam(value = "level", defaultValue = "ROOM") LEVEL level,
-                                 @RequestParam(value = "uoiClass", required = false) String uoiClass,
-                                 @RequestParam(value = "parentUOI", required = false) String parentUOI) throws Exception {
+    public UOINode generateNewUOI(@RequestParam(value = "countryCode", defaultValue = "NL") String countryCode,
+                                  @RequestParam(value = "level", defaultValue = "ROOM") LEVEL level,
+                                  @RequestParam(value = "uoiClass", required = false) String uoiClass,
+                                  @RequestParam(value = "parentUOI", required = false) String parentUOI) throws Exception {
         return service.generateNewUOI(countryCode, level, uoiClass, parentUOI);
     }
 
     @Operation(summary = "Search for a UOI node by UOI or property.")
     @GetMapping("/search/uoi")
-    public String getNodes(@RequestParam(value = "uoi") String uoi) {
+    public Object getNodes(@RequestParam(value = "uoi") String uoi) {
         return service.search(uoi);
     }
 
     @Operation(summary = "adding properties to a node.")
     @PutMapping("/node/properties")
-    public String putNodeProperties(@RequestParam(value = "uoi") String uoi,
-                                      @RequestParam(value = "key") String key,
-                                      @RequestParam(value = "value") String value) {
+    public UOINode putNodeProperties(@RequestParam(value = "uoi") String uoi,
+                                     @RequestParam(value = "key") String key,
+                                     @RequestParam(value = "value") String value) {
         return service.putProperties(uoi, key, value);
 
     }
 
     @Operation(summary = "Search for UOI by existing properties.")
     @GetMapping("/search/properties")
-    public List getNodeByProps(@RequestParam(value = "key") String key,
+    public ArrayList getNodeByProps(@RequestParam(value = "key") String key,
                                  @RequestParam(value = "value") String value,
                                  @RequestParam(value = "withMetaData" , defaultValue = "false") boolean withMetaData){
-        return service.searchByProperties(key, value, withMetaData);
+
+        ArrayList r = (ArrayList) service.searchByProperties(key, value, withMetaData);
+        return r;
     }
 
 
