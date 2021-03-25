@@ -1,21 +1,39 @@
 package io.recheck.uoi;
 
-import org.json.JSONObject;
+import io.recheck.uoi.dto.UOIPutRequestDTO;
+import io.recheck.uoi.exceptions.GeneralErrorException;
+import io.recheck.uoi.exceptionhandler.RestExceptionHandler;
+import io.recheck.uoi.exceptions.NodeNotFoundException;
+import io.recheck.uoi.exceptions.ValidationErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import io.recheck.uoi.entity.LEVEL;
 import io.recheck.uoi.entity.UOINode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class UOIService {
 
     @Autowired
+    RestExceptionHandler restExceptionHandler;
+
+    @Autowired
     UOIRepository uoiRepository;
 
     public UOINode generateNewUOI(String countryCode, LEVEL level, String uoiClass, String parentUOI) throws Exception {
+        countryCode = countryCode.toUpperCase(Locale.ROOT);
+        if (countryCode.trim().length()!=2){
+            throw new ValidationErrorException("The country acronym has to be 2 letters");
+        }
+
+        //TODO: checking the LEVEL of the newly created UOI
+//        if (){
+//            throw new ValidationErrorException("The UOI have to have a hierarchy level.");
+//        }
 
         UOINode node = null;
         if (parentUOI != null) {
@@ -28,7 +46,8 @@ public class UOIService {
                 uoiRepository.save(node);
                 uoiRepository.save(parentNode);
             } catch (Exception e) {
-//                return new String("This node is not found in the db.");
+                System.out.println(e.getMessage());
+                throw new NodeNotFoundException();
             }
         } else {
             node = new UOINode(countryCode, level, uoiClass);
@@ -38,46 +57,56 @@ public class UOIService {
         return node;
     }
 
-    public Object search(String uoi) {
+    public Object search(String uoi) throws NodeNotFoundException {
         UOINode node = uoiRepository.findByUoi(uoi);
         if (node != null) {
             System.out.println(node);
             return node;
-        }else {
-            return "The node does not exist.";
+        } else {
+            throw new NodeNotFoundException();
         }
     }
 
-    public List searchByProperties(String key, String value, boolean withMetaData){
+    public List searchByProperties(String key, String value, boolean withMetaData) throws GeneralErrorException {
         ArrayList<UOINode> result = new ArrayList();
         ArrayList<String> resultUOIOnly = new ArrayList();
         ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
-        for (int i=0;i<nodes.size();i++){
-            UOINode node = nodes.get(i);
-            if (node.getProperties()!= null && !node.getProperties().isEmpty()) {
-                if (node.getProperties().containsKey(key)){
-                    if(node.getProperties().get(key).equals(value)){
-                        result.add(node);
-                        resultUOIOnly.add(node.getUoi());
+        if (nodes != null) {
+            for (int i = 0; i < nodes.size(); i++) {
+                UOINode node = nodes.get(i);
+                if (node.getProperties() != null && !node.getProperties().isEmpty()) {
+                    if (node.getProperties().containsKey(key)) {
+                        if (node.getProperties().get(key).equals(value)) {
+                            result.add(node);
+                            resultUOIOnly.add(node.getUoi());
+                        }
                     }
                 }
             }
+            if (withMetaData) {
+                System.out.println(result);
+                return result;
+            } else {
+                return resultUOIOnly;
+            }
+        } else {
+            throw new GeneralErrorException();
         }
-        if (withMetaData){
-            System.out.println(result);
-            return result;
-        }else {
-            return resultUOIOnly;
-        }
+
     }
 
-    public UOINode putProperties(String uoi, String key, String value) {
-            UOINode node = uoiRepository.findByUoi(uoi);
-            node.addMoreProperties(key.trim(),value.trim());
+    public UOINode putProperties(UOIPutRequestDTO uoiPutRequestDTO) throws NodeNotFoundException {
+        UOINode node = uoiRepository.findByUoi(uoiPutRequestDTO.getUoi());
+        if (node != null) {
+            node.addMoreProperties(uoiPutRequestDTO.getKey().trim(), uoiPutRequestDTO.getValue().trim());
             uoiRepository.save(node);
             return node;
+        } else {
+            throw new NodeNotFoundException();
+        }
 
     }
+
     public void demoNodes(UOIRepository uoiRepository) {
         List<UOINode> nodes = new ArrayList<UOINode>();
 
@@ -349,4 +378,5 @@ public class UOIService {
 
         uoiRepository.saveAll(nodes);
     }
+
 }
