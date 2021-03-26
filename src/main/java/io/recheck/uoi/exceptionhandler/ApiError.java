@@ -1,6 +1,8 @@
 package io.recheck.uoi.exceptionhandler;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -9,51 +11,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+@Data
 @ControllerAdvice
 public class ApiError {
 
     private HttpStatus status;
-
-    public HttpStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(HttpStatus status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getDebugMessage() {
-        return debugMessage;
-    }
-
-    public void setDebugMessage(String debugMessage) {
-        this.debugMessage = debugMessage;
-    }
-
-    public List<ApiSubError> getSubErrors() {
-        return subErrors;
-    }
-
-    public void setSubErrors(List<ApiSubError> subErrors) {
-        this.subErrors = subErrors;
-    }
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private LocalDateTime timestamp;

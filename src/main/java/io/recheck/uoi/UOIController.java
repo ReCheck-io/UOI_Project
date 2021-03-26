@@ -2,6 +2,7 @@ package io.recheck.uoi;
 
 
 import io.recheck.uoi.dto.UOIPutRequestDTO;
+import io.recheck.uoi.dto.UOIRelationshipDTO;
 import io.recheck.uoi.exceptions.GeneralErrorException;
 import io.recheck.uoi.exceptionhandler.RestExceptionHandler;
 import io.recheck.uoi.exceptions.NodeNotFoundException;
@@ -57,85 +58,10 @@ public class UOIController {
     }
 
 
-    //TODO: da napravq DTO s 2te id-ta i da se razpoznava tipa na vryzkata i da se napravi
-//    @PutMapping("/node")
-//    public String nodePartOfAnother(@RequestParam(value = "uoi") String uoi,
-//                                    @RequestParam(value = "uoiPartOf") String uoiPartOf) {
-//        int nodePlace = 999999999;
-//        int nodePlacePartOf = 999999999;
-//        ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
-//        for (int i = 0; i < nodes.size(); i++) {
-//            if (nodes.get(i).getUoi().equals(uoi)) {
-//                nodePlace = i;
-//            }
-//            if (nodes.get(i).getUoi().equals(uoiPartOf)) {
-//                nodePlacePartOf = i;
-//            }
-//        }
-//        if (nodePlace < 99999999) {
-//            if (nodePlacePartOf < 99999999) {
-//                nodes.get(nodePlacePartOf).partOf(nodes.get(nodePlace));
-//                uoiRepository.saveAll(nodes);
-//            }
-//        }
-//        ArrayList<UOINode> usedNodes = new ArrayList();
-//        usedNodes.add(nodes.get(nodePlacePartOf));
-//        usedNodes.add(nodes.get(nodePlace));
-//        return usedNodes.toString();
-//    }
-
-//    //TODO: da se razkara i da byde obedineno s gornoto
-//    @GetMapping("/node")
-//    public String nodeConsistedOfAnother(@RequestParam(value = "uuid") String uuid, @RequestParam(value = "uuidConsistedOf") String uuidConsistedOf) {
-//        int nodePlace = 999999999;
-//        int nodePlaceConsistedOf = 999999999;
-//        ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
-//        for (int i = 0; i < nodes.size(); i++) {
-//            if (nodes.get(i).getUoi().equals(uuidConsistedOf)) {
-//                nodePlaceConsistedOf = i;
-//            }
-//            if (nodes.get(i).getUoi().equals(uuid)) {
-//                nodePlace = i;
-//            }
-//        }
-//        if (nodePlace < 99999999) {
-//            if (nodePlaceConsistedOf < 99999999) {
-//                nodes.get(nodePlace).consistsOf(nodes.get(nodePlaceConsistedOf));
-//                uoiRepository.saveAll(nodes);
-//            }
-//        }
-//        ArrayList<UOINode> usedNodes = new ArrayList();
-//        usedNodes.add(nodes.get(nodePlaceConsistedOf));
-//        usedNodes.add(nodes.get(nodePlace));
-//        return usedNodes.toString();
-//    }
-//
-//    //TODO: da go razkaram i da vleze pri ostanalite za relationship
-//    @GetMapping("/node")
-//    public String nodeHistoryOfAnother(@RequestParam(value = "uoi") String uoi, @RequestParam(value = "uoiHistoryOf") String uoiHistoryOf) {
-//        int nodePlace = 999999999;
-//        int nodePlaceHistoryOf = 999999999;
-//        ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
-//        for (int i = 0; i < nodes.size(); i++) {
-//            if (nodes.get(i).getUoi().equals(uoi)) {
-//                nodePlace = i;
-//            }
-//            if (nodes.get(i).getUoi().equals(uoiHistoryOf)) {
-//                nodePlaceHistoryOf = i;
-//            }
-//        }
-//        if (nodePlace < 99999999) {
-//            if (nodePlaceHistoryOf < 99999999) {
-//                nodes.get(nodePlaceHistoryOf).historyOf(nodes.get(nodePlace));
-//                uoiRepository.saveAll(nodes);
-//            }
-//        }
-//        ArrayList<UOINode> usedNodes = new ArrayList();
-//        usedNodes.add(nodes.get(nodePlaceHistoryOf));
-//        usedNodes.add(nodes.get(nodePlace));
-//        return usedNodes.toString();
-//    }
-
+    @PutMapping("/node/relationship")
+    public String nodePartOfAnother(@RequestBody UOIRelationshipDTO uoiRelationshipDTO) throws NodeNotFoundException {
+        return service.makeRelationship(uoiRelationshipDTO);
+    }
 
     @PostMapping(path = "/newWithInformation", consumes = "application/json", produces = "application/json")
     public UOINode addMember(@RequestBody UOINode uoiNode) {
@@ -143,21 +69,21 @@ public class UOIController {
         return uoiNode;
     }
 
-    @GetMapping("/demoNodes")
-    public String executeDemoNode() {
-        uoiRepository.deleteAll();
-        service.demoNodes(uoiRepository);
-        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503104983629824/Untitled_Diagram1.png'/> " +
-                "</body></html>";
-    }
-
-    @GetMapping("/scenarioCombine")
-    public String executeDemoNodeCombineTwoRooms() {
-        uoiRepository.deleteAll();
-        service.demoNodesCombineTwoRooms(uoiRepository);
-        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503102551064576/Untitled_Diagram3.png'/> " +
-                "</body></html>";
-    }
+//    @GetMapping("/demoNodes")
+//    public String executeDemoNode() {
+//        uoiRepository.deleteAll();
+//        service.demoNodes(uoiRepository);
+//        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503104983629824/Untitled_Diagram1.png'/> " +
+//                "</body></html>";
+//    }
+//
+//    @GetMapping("/scenarioCombine")
+//    public String executeDemoNodeCombineTwoRooms() {
+//        uoiRepository.deleteAll();
+//        service.demoNodesCombineTwoRooms(uoiRepository);
+//        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503102551064576/Untitled_Diagram3.png'/> " +
+//                "</body></html>";
+//    }
 
     @GetMapping("/clearDB")
     public String clearDB() {
@@ -172,13 +98,13 @@ public class UOIController {
 
     }
 
-    @GetMapping("/scenarioAddANewRoom")
-    public String executeDemoNodeAddANewRoom() {
-        uoiRepository.deleteAll();
-        service.demoNodesAddANewRoom(uoiRepository);
-        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503092572553226/Untitled_Diagram4.png'/> " +
-                "</body></html>";
-    }
+//    @GetMapping("/scenarioAddANewRoom")
+//    public String executeDemoNodeAddANewRoom() {
+//        uoiRepository.deleteAll();
+//        service.demoNodesAddANewRoom(uoiRepository);
+//        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503092572553226/Untitled_Diagram4.png'/> " +
+//                "</body></html>";
+//    }
 
 
 

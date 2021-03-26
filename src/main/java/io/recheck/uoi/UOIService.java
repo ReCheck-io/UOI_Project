@@ -1,6 +1,8 @@
 package io.recheck.uoi;
 
+import io.recheck.uoi.dto.RELATIONSHIP;
 import io.recheck.uoi.dto.UOIPutRequestDTO;
+import io.recheck.uoi.dto.UOIRelationshipDTO;
 import io.recheck.uoi.exceptions.GeneralErrorException;
 import io.recheck.uoi.exceptionhandler.RestExceptionHandler;
 import io.recheck.uoi.exceptions.NodeNotFoundException;
@@ -28,6 +30,18 @@ public class UOIService {
         countryCode = countryCode.toUpperCase(Locale.ROOT);
         if (countryCode.trim().length()!=2){
             throw new ValidationErrorException("The country acronym has to be 2 letters");
+        }else{
+            String[] contries = Locale.getISOCountries();
+            boolean res = false;
+            for (String contry : contries) {
+                if (contry.equals(countryCode)) {
+                    res = true;
+                    break;
+                }
+            }
+            if (!res){
+                throw new ValidationErrorException("The country acronym you provided "+countryCode+ "  is not recognized");
+            }
         }
 
         //TODO: checking the LEVEL of the newly created UOI
@@ -76,7 +90,8 @@ public class UOIService {
                 UOINode node = nodes.get(i);
                 if (node.getProperties() != null && !node.getProperties().isEmpty()) {
                     if (node.getProperties().containsKey(key)) {
-                        if (node.getProperties().get(key).equals(value)) {
+                        //TODO: DISCUSS
+                        if (node.getProperties().get(key).contains(value)) {
                             result.add(node);
                             resultUOIOnly.add(node.getUoi());
                         }
@@ -105,6 +120,33 @@ public class UOIService {
             throw new NodeNotFoundException();
         }
 
+    }
+
+    public String makeRelationship(UOIRelationshipDTO uoiRelationshipDTO) throws NodeNotFoundException {
+        //find the two nodes
+        //check what type of relationship it is
+        //connect the nodes
+        UOINode parent = uoiRepository.findByUoi(uoiRelationshipDTO.getParentNode());
+        if (parent == null){
+            throw new NodeNotFoundException("The parent node is not found in the db.");
+        }
+        UOINode child = uoiRepository.findByUoi(uoiRelationshipDTO.getChildNode());
+        if (child == null){
+            throw new NodeNotFoundException("The child node is not found in the db.");
+        }
+        String res = "";
+        if (uoiRelationshipDTO.getRelationship().equals(RELATIONSHIP.PARTOF) || uoiRelationshipDTO.getRelationship().equals(RELATIONSHIP.CONSISTSOF)){
+            child.partOf(parent);
+            parent.consistsOf(child);
+            uoiRepository.save(parent);
+            uoiRepository.save(child);
+             res = "The " + uoiRelationshipDTO.getChildNode() + " is now part of " + uoiRelationshipDTO.getParentNode();
+
+            //       }else if(uoiRelationshipDTO.getRelationship().equals(RELATIONSHIP.HISTORYOF)){
+
+//            parent.historyOf(child);
+        }
+        return res;
     }
 
     public void demoNodes(UOIRepository uoiRepository) {

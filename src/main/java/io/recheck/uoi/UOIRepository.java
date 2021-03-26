@@ -12,7 +12,7 @@ public interface UOIRepository extends Neo4jRepository<UOINode, Long> {
 
 //    void historyOf(UOINode uoiNode);
 
-    void children(UOINode uoiNode);
+    void child(UOINode childUOI);
 
     UOINode findByUoi(@Param("uoi") String uoi);
 

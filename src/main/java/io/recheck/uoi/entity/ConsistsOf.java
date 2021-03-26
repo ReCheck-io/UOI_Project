@@ -1,10 +1,14 @@
 package io.recheck.uoi.entity;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.neo4j.ogm.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
+@NoArgsConstructor
 @RelationshipEntity(type = "CONSISTS_OF")
 public class ConsistsOf {
     @Id
@@ -21,39 +25,4 @@ public class ConsistsOf {
     @EndNode
     private UOINode uoiNodeParent;
 
-    public ConsistsOf() {
-
-    }
-
-    public List<UOINode> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<UOINode> children) {
-        this.children = children;
-    }
-
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public UOINode getUoiNodeChild() {
-        return uoiNodeChild;
-    }
-
-    public void setUoiNodeChild(UOINode uoiNodeConsistedOf) {
-        this.uoiNodeChild = uoiNodeConsistedOf;
-    }
-
-    public UOINode getUoiNodeParent() {
-        return uoiNodeParent;
-    }
-
-    public void setUoiNodeParent(UOINode uoiNodeParent) {
-        this.uoiNodeParent = uoiNodeParent;
-    }
 }

@@ -1,7 +1,10 @@
 package io.recheck.uoi.entity;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.neo4j.ogm.annotation.*;
-
+@Data
+@NoArgsConstructor
 @RelationshipEntity(type = "PART_OF")
 public class PartOf {
     @Id
@@ -20,34 +23,6 @@ public class PartOf {
         this.uoiNodePartOf = uoiNodePartOf;
         this.parent = parent;
         this.timestamp = timestamp;
-    }
-
-    public PartOf() {
-
-    }
-
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public UOINode getParent() {
-        return parent;
-    }
-
-    public void setParent(UOINode parent) {
-        this.parent = parent;
-    }
-
-    public UOINode getUoiNodePartOf() {
-        return uoiNodePartOf;
-    }
-
-    public void setUoiNodePartOf(UOINode uoiNodePartOf) {
-        this.uoiNodePartOf = uoiNodePartOf;
     }
 
 }
