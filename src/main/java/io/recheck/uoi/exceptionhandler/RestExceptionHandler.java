@@ -56,5 +56,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArgumentError(Exception ex) {
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE);
+        apiError.setMessage("A validation error has been encountered.");
+        apiError.setDebugMessage(ex.getLocalizedMessage());
+        return buildResponseEntity(apiError);
+    }
+
 
 }

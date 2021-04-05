@@ -3,6 +3,7 @@ package io.recheck.uoi.dto;
 import io.recheck.uoi.entity.LEVEL;
 import io.recheck.uoi.exceptions.ValidationErrorException;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -11,36 +12,42 @@ import java.util.Locale;
 
 
 @Data
+@NoArgsConstructor
 public class NewUOIDTO {
 
-    @NotBlank(message = "Country code (Country's acronym) may not be empty")
-    @Size(min = 2, max = 32, message = "Name must be between 2 and 32 characters long")
+    @NotBlank(message = "Country code (Country's acronym) may not be empty.")
     private String countryCode;
 
-    @NotBlank(message = "Level may not be empty")
+    @NotBlank(message = "Level may not be empty.")
     private LEVEL level;
     private String uoiClass;
     private String parentUOI;
 
-    public NewUOIDTO(String countryCode, String level, String uoiClass, String parentUOI) throws ValidationErrorException {
-        this.countryCode = setCountryCode(countryCode);
-        this.level = setLevel(level);
+    public NewUOIDTO(String countryCode, LEVEL level, String uoiClass, String parentUOI) throws ValidationErrorException {
+        //        this.countryCode = setCountryCode(countryCode);
+        this.countryCode = countryCode;
+//        this.level = setLevel(level);
+        this.level = level;
         this.uoiClass = uoiClass;
         this.parentUOI = parentUOI;
     }
 
-    public NewUOIDTO(String countryCode, String level, String uoiClass) throws ValidationErrorException {
-        this.countryCode = setCountryCode(countryCode);
-        this.level = setLevel(level);
+    public NewUOIDTO(String countryCode, LEVEL level, String uoiClass) throws ValidationErrorException {
+        //        this.countryCode = setCountryCode(countryCode);
+        this.countryCode = countryCode;
+        //        this.level = setLevel(level);
+        this.level = level;
         this.uoiClass = uoiClass;
     }
 
-    public NewUOIDTO(String countryCode, String  level) throws ValidationErrorException {
-        this.countryCode = setCountryCode(countryCode);
-        this.level = setLevel(level);
+    public NewUOIDTO(String countryCode, LEVEL level) throws ValidationErrorException {
+//        this.countryCode = setCountryCode(countryCode);
+        this.countryCode = countryCode;
+        //        this.level = setLevel(level);
+        this.level = level;
     }
 
-    public String setCountryCode(String countryCode) throws ValidationErrorException {
+    public String countryCodeValidation(String countryCode) throws ValidationErrorException {
         countryCode = countryCode.toUpperCase(Locale.ROOT);
         if (countryCode.trim().length() != 2) {
             throw new ValidationErrorException("The country acronym has to be 2 letters");
@@ -60,7 +67,7 @@ public class NewUOIDTO {
         return countryCode;
     }
 
-    public LEVEL setLevel(String level) throws ValidationErrorException {
+    public LEVEL levelValidation(String level) throws ValidationErrorException {
         level = level.toUpperCase(Locale.ROOT);
         LEVEL tempLevel = null;
         LEVEL[] levels = LEVEL.values();

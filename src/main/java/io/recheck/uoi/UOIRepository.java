@@ -5,6 +5,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import io.recheck.uoi.entity.UOINode;
 
+import java.util.ArrayList;
+
 @Repository
 public interface UOIRepository extends Neo4jRepository<UOINode, Long> {
 
@@ -12,7 +14,7 @@ public interface UOIRepository extends Neo4jRepository<UOINode, Long> {
 
 //    void historyOf(UOINode uoiNode);
 
-    void child(UOINode childUOI);
+    void children(UOINode children);
 
     UOINode findByUoi(@Param("uoi") String uoi);
 

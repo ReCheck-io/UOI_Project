@@ -16,5 +16,5 @@ public class UOISearchByPropertiesDTO {
         this.value = value;
         this.metaData = metaData;
     }
-    
+
 }

@@ -1,17 +1,21 @@
 package io.recheck.uoi;
 
 
+import io.recheck.uoi.dto.NewUOIDTO;
 import io.recheck.uoi.dto.UOIPutRequestDTO;
 import io.recheck.uoi.dto.UOIRelationshipDTO;
+import io.recheck.uoi.dto.UOISearchByPropertiesDTO;
 import io.recheck.uoi.exceptions.GeneralErrorException;
 import io.recheck.uoi.exceptionhandler.RestExceptionHandler;
 import io.recheck.uoi.exceptions.NodeNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import io.recheck.uoi.entity.LEVEL;
 import io.recheck.uoi.entity.UOINode;
 
+@Slf4j
 @RestController
 public class UOIController {
 
@@ -26,11 +30,8 @@ public class UOIController {
 
     @Operation(summary = "Creating a new basic UOI without metadata.")
     @GetMapping("/new")
-    public UOINode generateNewUOI(@RequestParam(value = "countryCode", defaultValue = "NL") String countryCode,
-                                  @RequestParam(value = "level", defaultValue = "ROOM") LEVEL level,
-                                  @RequestParam(value = "uoiClass", required = false) String uoiClass,
-                                  @RequestParam(value = "parentUOI", required = false) String parentUOI) throws Exception {
-        return service.generateNewUOI(countryCode, level, uoiClass, parentUOI);
+    public UOINode generateNewUOI(NewUOIDTO newUOIDTO) throws Exception {
+        return service.generateNewUOI(newUOIDTO);
     }
 
     @Operation(summary = "Search for a UOI node by UOI or property.")
@@ -41,26 +42,23 @@ public class UOIController {
 
     @Operation(summary = "adding properties to a node.")
     @PutMapping("/node/properties")
-    public UOINode putNodeProperties(@RequestBody UOIPutRequestDTO uoiPutRequestDTO) throws NodeNotFoundException {
-        return service.putProperties(uoiPutRequestDTO);
-
+    public void putNodeProperties(@RequestBody UOIPutRequestDTO uoiPutRequestDTO) throws NodeNotFoundException {
+        service.putProperties(uoiPutRequestDTO);
     }
 
     @Operation(summary = "Search for UOI by existing properties.")
     @GetMapping("/search/properties")
     public Object getNodeByProps(@RequestParam(value = "key") String key,
                                  @RequestParam(value = "value") String value,
-                                 @RequestParam(value = "withMetaData" , defaultValue = "false") boolean withMetaData) throws GeneralErrorException {
+                                 @RequestParam(value = "withMetaData" , defaultValue = "false") boolean withMetaData) throws NodeNotFoundException {
 
-            return service.searchByProperties(key, value, withMetaData);
-
-
+            return service.searchByProperties( new UOISearchByPropertiesDTO(key, value, withMetaData));
     }
 
 
     @PutMapping("/node/relationship")
-    public String nodePartOfAnother(@RequestBody UOIRelationshipDTO uoiRelationshipDTO) throws NodeNotFoundException {
-        return service.makeRelationship(uoiRelationshipDTO);
+    public void nodePartOfAnother(@RequestBody UOIRelationshipDTO uoiRelationshipDTO) throws NodeNotFoundException {
+        service.makeRelationship(uoiRelationshipDTO);
     }
 
     @PostMapping(path = "/newWithInformation", consumes = "application/json", produces = "application/json")

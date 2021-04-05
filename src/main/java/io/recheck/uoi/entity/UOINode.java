@@ -27,7 +27,7 @@ public class UOINode {
     private String uoiClass;
     private String countryCode;
     private LEVEL level;
-    private ArrayList children = new ArrayList();
+//    private ArrayList children = new ArrayList();
 
     public UOINode(String countryCode, LEVEL level, String uoiClass) {
         this.uoi = countryCode + "." + UUID.randomUUID();
@@ -46,6 +46,7 @@ public class UOINode {
 
     @JsonIgnoreProperties("UOINode")
     @Relationship(type = "PART_OF", direction = Relationship.OUTGOING)
+    @Setter @Getter (AccessLevel.PRIVATE)
     private UOINode parent = null;
 
     public UOINode(LEVEL level, String owner) {
@@ -62,22 +63,22 @@ public class UOINode {
 
     @JsonIgnoreProperties("UOINode")
     @Relationship(type = "CONSISTS_OF", direction = Relationship.OUTGOING)
-    private UOINode child = null;
+    private List<UOINode> children = new ArrayList<>();
 
-    public void consistsOf(UOINode childUOI) {
-        if (this.getChildren() == null) {
-            this.setChildren(children);
-        }
-
-        setChild(child);
-
-        if (!this.getChildren().contains(childUOI.getUoi())) {
-            this.getChildren().add(childUOI.getUoi());
-
-        }else {
-            System.out.println("The node is already registered as a child");
-        }
-    }
+//    public void consistsOf(UOINode childUOI) {
+//        if (this.getChildren() == null) {
+//            this.setChildren(children);
+//        }
+//
+//        setChild(child);
+//
+//        if (!this.getChildren().contains(childUOI.getUoi())) {
+//            this.getChildren().add(childUOI.getUoi());
+//
+//        }else {
+//            System.out.println("The node is already registered as a child");
+//        }
+//    }
 
 //    @JsonIgnoreProperties("UOINode")
 //    @Relationship(type = "HISTORY_OF", direction = Relationship.OUTGOING)
