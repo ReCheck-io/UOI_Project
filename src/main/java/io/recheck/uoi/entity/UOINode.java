@@ -36,12 +36,12 @@ public class UOINode {
         this.uoiClass = uoiClass;
     }
 
-    public UOINode(String countryCode, LEVEL level, String uoiClass, String parentUOI) {
+    public UOINode(String countryCode, LEVEL level, String owner, String uoiClass) {
         this.uoi = countryCode + "." + UUID.randomUUID();
         this.level = level;
         this.timestamp = String.valueOf(new Date().getTime());
         this.uoiClass = uoiClass;
-        this.parentUOI = parentUOI;
+        this.owner = owner;
     }
 
     @JsonIgnoreProperties("UOINode")

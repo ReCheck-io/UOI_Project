@@ -14,6 +14,7 @@ import io.recheck.uoi.entity.UOINode;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+
 @Slf4j
 @Service
 
@@ -30,9 +31,8 @@ public class UOIService {
         if (StringUtils.hasText(newUOIDTO.getParentUOI())) {
             try {
                 UOINode parentNode = uoiRepository.findByUoi(newUOIDTO.getParentUOI());
-                node = new UOINode(newUOIDTO.getCountryCode(), newUOIDTO.getLevel(), newUOIDTO.getUoiClass(), newUOIDTO.getParentUOI());
+                node = new UOINode(newUOIDTO.getCountryCode(), newUOIDTO.getLevel(), newUOIDTO.getOwner(), newUOIDTO.getUoiClass());
                 uoiRepository.save(node);
-
                 node.partOf(parentNode);
                 uoiRepository.save(node);
                 uoiRepository.save(parentNode);
@@ -42,7 +42,7 @@ public class UOIService {
                 throw new NodeNotFoundException();
             }
         } else {
-            node = new UOINode(newUOIDTO.getCountryCode(), newUOIDTO.getLevel(), newUOIDTO.getUoiClass());
+            node = new UOINode(newUOIDTO.getCountryCode(), newUOIDTO.getLevel(), newUOIDTO.getOwner(), newUOIDTO.getUoiClass());
         }
         System.out.println(node.toString());
         uoiRepository.save(node);
@@ -59,6 +59,31 @@ public class UOIService {
         }
     }
 
+    public Object searchByOwner(String owner) throws NodeNotFoundException {
+        ArrayList<UOINode> result = new ArrayList();
+        ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
+        if (nodes != null) {
+            for (UOINode node : nodes) {
+                if (node.getOwner() != null && !node.getOwner().isEmpty()) {
+                    if (node.getOwner().equals(owner)) {
+                        result.add(node);
+                    }
+                }
+            }
+        } else {
+            //TODO: DTO that returns when there are no nodes found.
+            log.warn("The database could be corrupted from testing with nested data");
+            throw new NodeNotFoundException("There are no nodes found following the requested criteria.");
+        }
+        //TODO: what to return
+        if (result.size()==0){
+            throw new NodeNotFoundException("There are no nodes that are owned by "+owner);
+        }else {
+            return result;
+        }
+
+    }
+
     public List searchByProperties(UOISearchByPropertiesDTO uoiSearchByPropertiesDTO) throws NodeNotFoundException {
         ArrayList<UOINode> result = new ArrayList();
         ArrayList<OnlyUOIDTO> resultUOIOnly = new ArrayList();
@@ -66,7 +91,6 @@ public class UOIService {
         if (nodes != null) {
             for (int i = 0; i < nodes.size(); i++) {
                 UOINode node = nodes.get(i);
-                log.info("Current node: " + node);
                 if (node.getProperties() != null && !node.getProperties().isEmpty()) {
                     if (node.getProperties().containsKey(uoiSearchByPropertiesDTO.getKey())) {
                         if (node.getProperties().get(uoiSearchByPropertiesDTO.getKey()).contains(uoiSearchByPropertiesDTO.getValue())) {
@@ -108,19 +132,19 @@ public class UOIService {
         //check what type of relationship it is
         //connect the nodes
         UOINode parent = uoiRepository.findByUoi(uoiRelationshipDTO.getParentNode());
-        if (parent == null){
+        if (parent == null) {
             throw new NodeNotFoundException("The parent node is not found in the db.");
         }
         UOINode child = uoiRepository.findByUoi(uoiRelationshipDTO.getChildNode());
-        if (child == null){
+        if (child == null) {
             throw new NodeNotFoundException("The child node is not found in the db.");
         }
         String res = "";
-        if (uoiRelationshipDTO.getRelationship().equals(RELATIONSHIP.PARTOF) || uoiRelationshipDTO.getRelationship().equals(RELATIONSHIP.CONSISTSOF)){
+        if (uoiRelationshipDTO.getRelationship().equals(RELATIONSHIP.PARTOF) || uoiRelationshipDTO.getRelationship().equals(RELATIONSHIP.CONSISTSOF)) {
             child.partOf(parent);
             uoiRepository.save(parent);
             uoiRepository.save(child);
-            ConsistsOf consistsOf = new ConsistsOf(child,parent);
+            ConsistsOf consistsOf = new ConsistsOf(child, parent);
             List<String> childrenUOIs = new ArrayList<>();
             childrenUOIs.add(child.getUoi());
             consistsOf.setChildren(childrenUOIs);
@@ -135,13 +159,31 @@ public class UOIService {
             uoiRepository.save(child);
 
 
-
-
             //       }else if(uoiRelationshipDTO.getRelationship().equals(RELATIONSHIP.HISTORYOF)){
 
 //            parent.historyOf(child);
         }
     }
+
+    public Object setNodeOwner(SetNodeOwnerDTO setNodeOwnerDTO) throws NodeNotFoundException {
+        UOINode node = uoiRepository.findByUoi(setNodeOwnerDTO.getUoi());
+        //TODO: ask if this works
+        if (StringUtils.hasText(node.toString())) {
+            log.info(node.toString());
+            node.setOwner(setNodeOwnerDTO.getOwner());
+            uoiRepository.save(node);
+            log.info("The new owner is " + node.getOwner());
+            return node;
+        } else {
+            throw new NodeNotFoundException();
+        }
+    }
+
+    public void requestAccess(RequestAccessDTO requestAccessDTO){
+
+    }
+
+
 //
 //    public void demoNodes(UOIRepository uoiRepository) {
 //        List<UOINode> nodes = new ArrayList<UOINode>();

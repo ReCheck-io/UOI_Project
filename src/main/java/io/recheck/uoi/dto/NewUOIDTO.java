@@ -20,28 +20,39 @@ public class NewUOIDTO {
 
     @NotBlank(message = "Level may not be empty.")
     private LEVEL level;
+    // the owner will be able to be changed by a higher lvl role in the hierarchy
+    private String owner;
     private String uoiClass;
     private String parentUOI;
 
-    public NewUOIDTO(String countryCode, LEVEL level, String uoiClass, String parentUOI) throws ValidationErrorException {
-        //        this.countryCode = setCountryCode(countryCode);
+    public NewUOIDTO(String countryCode, LEVEL level, String owner, String uoiClass, String parentUOI) throws ValidationErrorException {
+        this.countryCode = countryCodeValidation(countryCode);
         this.countryCode = countryCode;
 //        this.level = setLevel(level);
+        this.owner = owner;
+        System.out.println("DTO owner: " + owner);
         this.level = level;
         this.uoiClass = uoiClass;
         this.parentUOI = parentUOI;
     }
 
-    public NewUOIDTO(String countryCode, LEVEL level, String uoiClass) throws ValidationErrorException {
-        //        this.countryCode = setCountryCode(countryCode);
+    public NewUOIDTO(String countryCode, LEVEL level, String owner, String uoiClass) throws ValidationErrorException {
+        this.countryCode = countryCodeValidation(countryCode);
         this.countryCode = countryCode;
         //        this.level = setLevel(level);
         this.level = level;
         this.uoiClass = uoiClass;
     }
 
+    public NewUOIDTO(String countryCode, LEVEL level, String owner) throws ValidationErrorException {
+        this.countryCode = countryCodeValidation(countryCode);
+        this.countryCode = countryCode;
+        //        this.level = setLevel(level);
+        this.level = level;
+    }
+
     public NewUOIDTO(String countryCode, LEVEL level) throws ValidationErrorException {
-//        this.countryCode = setCountryCode(countryCode);
+        this.countryCode = countryCodeValidation(countryCode);
         this.countryCode = countryCode;
         //        this.level = setLevel(level);
         this.level = level;

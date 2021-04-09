@@ -14,6 +14,6 @@ springdoc:
 server:
  forward-headers-strategy: framework
 
-logging:
-  level:
-    root: ERROR
+#logging:
+#  level:
+#    root: ERROR

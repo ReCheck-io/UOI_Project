@@ -1,10 +1,7 @@
 package io.recheck.uoi;
 
 
-import io.recheck.uoi.dto.NewUOIDTO;
-import io.recheck.uoi.dto.UOIPutRequestDTO;
-import io.recheck.uoi.dto.UOIRelationshipDTO;
-import io.recheck.uoi.dto.UOISearchByPropertiesDTO;
+import io.recheck.uoi.dto.*;
 import io.recheck.uoi.exceptions.GeneralErrorException;
 import io.recheck.uoi.exceptionhandler.RestExceptionHandler;
 import io.recheck.uoi.exceptions.NodeNotFoundException;
@@ -30,8 +27,12 @@ public class UOIController {
 
     @Operation(summary = "Creating a new basic UOI without metadata.")
     @GetMapping("/new")
-    public UOINode generateNewUOI(NewUOIDTO newUOIDTO) throws Exception {
-        return service.generateNewUOI(newUOIDTO);
+    public UOINode generateNewUOI(@RequestParam(value = "countryCode", defaultValue = "NL") String countryCode,
+                                  @RequestParam(value = "level", defaultValue = "ROOM") LEVEL level,
+                                  @RequestParam(value = "owner", required = false) String owner,
+                                  @RequestParam(value = "uoiClass", required = false) String uoiClass,
+                                  @RequestParam(value = "parentUOI", required = false) String parentUOI) throws Exception {
+        return service.generateNewUOI( new NewUOIDTO(countryCode, level, owner, uoiClass, parentUOI));
     }
 
     @Operation(summary = "Search for a UOI node by UOI or property.")
@@ -67,6 +68,21 @@ public class UOIController {
         return uoiNode;
     }
 
+    @Operation(summary = "Search for UOIs that are owned by user:")
+    @GetMapping(path = "/search/owner")
+    public Object getNodesByOwner(@RequestParam(value = "owner") String owner) throws NodeNotFoundException {
+        return service.searchByOwner(owner);
+    }
+
+    @PutMapping(path = "/set/node/owner")
+    public Object setNodeOwner(@RequestBody SetNodeOwnerDTO setNodeOwnerDTO) throws NodeNotFoundException {
+       return service.setNodeOwner(setNodeOwnerDTO);
+    }
+
+    @PostMapping(path = "/uoi")
+    public void requestAccess(@RequestBody RequestAccessDTO requestAccessDTO){
+        service.requestAccess(requestAccessDTO);
+    }
 //    @GetMapping("/demoNodes")
 //    public String executeDemoNode() {
 //        uoiRepository.deleteAll();
