@@ -43,8 +43,8 @@ public class UOIController {
 
     @Operation(summary = "adding properties to a node.")
     @PutMapping("/node/properties")
-    public void putNodeProperties(@RequestBody UOIPutRequestDTO uoiPutRequestDTO) throws NodeNotFoundException {
-        service.putProperties(uoiPutRequestDTO);
+    public Object putNodeProperties(@RequestBody UOIPutRequestDTO uoiPutRequestDTO) throws NodeNotFoundException {
+        return service.putProperties(uoiPutRequestDTO);
     }
 
     @Operation(summary = "Search for UOI by existing properties.")
@@ -58,8 +58,8 @@ public class UOIController {
 
 
     @PutMapping("/node/relationship")
-    public void nodePartOfAnother(@RequestBody UOIRelationshipDTO uoiRelationshipDTO) throws NodeNotFoundException {
-        service.makeRelationship(uoiRelationshipDTO);
+    public Object nodePartOfAnother(@RequestBody UOIRelationshipDTO uoiRelationshipDTO) throws NodeNotFoundException {
+        return service.makeRelationship(uoiRelationshipDTO);
     }
 
     @PostMapping(path = "/newWithInformation", consumes = "application/json", produces = "application/json")

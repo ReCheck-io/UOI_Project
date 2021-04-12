@@ -63,22 +63,20 @@ public class UOINode {
 
     @JsonIgnoreProperties("UOINode")
     @Relationship(type = "CONSISTS_OF", direction = Relationship.OUTGOING)
-    private List<UOINode> children = new ArrayList<>();
+    private List<String> children = new ArrayList<>();
 
-//    public void consistsOf(UOINode childUOI) {
-//        if (this.getChildren() == null) {
-//            this.setChildren(children);
-//        }
-//
-//        setChild(child);
-//
-//        if (!this.getChildren().contains(childUOI.getUoi())) {
-//            this.getChildren().add(childUOI.getUoi());
-//
-//        }else {
-//            System.out.println("The node is already registered as a child");
-//        }
-//    }
+    public void consistsOf(UOINode childUOI) {
+        if (this.getChildren() == null) {
+            this.setChildren(children);
+        }
+
+        if (!this.getChildren().contains(childUOI.getUoi())) {
+            this.getChildren().add(childUOI.getUoi());
+
+        }else {
+            System.out.println("The node is already registered as a child");
+        }
+    }
 
 //    @JsonIgnoreProperties("UOINode")
 //    @Relationship(type = "HISTORY_OF", direction = Relationship.OUTGOING)

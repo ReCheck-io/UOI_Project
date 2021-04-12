@@ -61,7 +61,7 @@ public class NewUOIDTO {
     public String countryCodeValidation(String countryCode) throws ValidationErrorException {
         countryCode = countryCode.toUpperCase(Locale.ROOT);
         if (countryCode.trim().length() != 2) {
-            throw new ValidationErrorException("The country acronym has to be 2 letters");
+            throw new ValidationErrorException("The country code (acronym) has to be 2 letters");
         } else {
             String[] contries = Locale.getISOCountries();
             boolean res = false;

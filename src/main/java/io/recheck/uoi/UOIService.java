@@ -115,19 +115,20 @@ public class UOIService {
 
     }
 
-    public void putProperties(UOIPutRequestDTO uoiPutRequestDTO) throws NodeNotFoundException {
+    public UOINode putProperties(UOIPutRequestDTO uoiPutRequestDTO) throws NodeNotFoundException {
         UOINode node = uoiRepository.findByUoi(uoiPutRequestDTO.getUoi());
         if (node != null) {
             node.addMoreProperties(uoiPutRequestDTO.getKey().trim(), uoiPutRequestDTO.getValue().trim());
             uoiRepository.save(node);
             log.info(String.valueOf(node));
+            return node;
         } else {
             throw new NodeNotFoundException();
         }
 
     }
 
-    public void makeRelationship(UOIRelationshipDTO uoiRelationshipDTO) throws NodeNotFoundException {
+    public Object makeRelationship(UOIRelationshipDTO uoiRelationshipDTO) throws NodeNotFoundException {
         //find the two nodes
         //check what type of relationship it is
         //connect the nodes
@@ -144,17 +145,7 @@ public class UOIService {
             child.partOf(parent);
             uoiRepository.save(parent);
             uoiRepository.save(child);
-            ConsistsOf consistsOf = new ConsistsOf(child, parent);
-            List<String> childrenUOIs = new ArrayList<>();
-            childrenUOIs.add(child.getUoi());
-            consistsOf.setChildren(childrenUOIs);
-
-
-//            charlie.setRoles(roleNames);
-//            List<Role> roles = new ArrayList();
-//            roles.add(charlie);
-//            italianJob.setRoles(roles);
-//            movieRepository.save(italianJob);
+            parent.consistsOf(child);
             uoiRepository.save(parent);
             uoiRepository.save(child);
 
@@ -163,6 +154,10 @@ public class UOIService {
 
 //            parent.historyOf(child);
         }
+        List<UOINode> result = new ArrayList<>();
+        result.add(parent);
+        result.add(child);
+        return result;
     }
 
     public Object setNodeOwner(SetNodeOwnerDTO setNodeOwnerDTO) throws NodeNotFoundException {
