@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import io.recheck.uoi.entity.LEVEL;
 import io.recheck.uoi.entity.UOINode;
 
+import java.util.ArrayList;
+
 @Slf4j
 @RestController
 public class UOIController {
@@ -81,6 +83,21 @@ public class UOIController {
     @GetMapping(path = "/search/owner")
     public Object getNodesByOwner(@RequestParam(value = "owner") String owner) throws NodeNotFoundException {
         return service.searchByOwner(owner);
+    }
+
+    @Operation(summary = "Search for UOIs that are owned by user:")
+    @Tag(name = "Search")
+    @GetMapping(path = "/search/uoiClass")
+    public Object getNodesByUoiClass(@RequestParam(value = "uoiClass") String uoiClass) throws NodeNotFoundException {
+        return service.searchByUoiClass(uoiClass);
+    }
+
+    @Operation(summary = "Retrieve information about the UOI's children, if Level provided, it will be level dependent.")
+    @Tag(name = "Retrieve")
+    @GetMapping(path = "/retrieve/uoi/children")
+    public ArrayList getNodeChildren(@RequestParam(value = "uoi") String uoi,
+                                     @RequestParam(value = "level" , required = false) LEVEL level) throws NodeNotFoundException {
+        return service.getNodeChildren( new GetChildrenDTO(uoi, level));
     }
 
     @Operation(summary = "Set the owner of the specific UOI node.")

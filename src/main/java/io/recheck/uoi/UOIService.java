@@ -13,6 +13,7 @@ import io.recheck.uoi.entity.LEVEL;
 import io.recheck.uoi.entity.UOINode;
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 @Slf4j
@@ -36,6 +37,9 @@ public class UOIService {
                 node.partOf(parentNode);
                 uoiRepository.save(node);
                 uoiRepository.save(parentNode);
+                parentNode.consistsOf(node);
+                uoiRepository.save(parentNode);
+                uoiRepository.save(node);
             } catch (Exception e) {
                 log.error(e.getMessage());
                 e.printStackTrace();
@@ -64,7 +68,7 @@ public class UOIService {
         ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
         if (nodes != null) {
             for (UOINode node : nodes) {
-                if (node.getOwner() != null && !node.getOwner().isEmpty()) {
+                if (StringUtils.hasText(node.getOwner())) {
                     if (node.getOwner().equals(owner)) {
                         result.add(node);
                     }
@@ -175,6 +179,64 @@ public class UOIService {
     }
 
     public void requestAccess(RequestAccessDTO requestAccessDTO){
+
+    }
+
+    public ArrayList getNodeChildren(GetChildrenDTO getChildrenDTO) throws NodeNotFoundException {
+        ArrayList<UOINode> result = new ArrayList<>();
+        UOINode node = uoiRepository.findByUoi(getChildrenDTO.getUoi());
+        if (node == null){
+            throw new NodeNotFoundException("The node has not been found in the database.");
+        }
+        List<String> children = node.getChildren();
+        if (getChildrenDTO.getLevel() != null){
+            for (String child : children) {
+                UOINode childNode = uoiRepository.findByUoi(child);
+                if (childNode.getLevel().equals(getChildrenDTO.getLevel())) {
+                    result.add(childNode);
+                }
+            }
+            if (result.size()==0){
+                throw new NodeNotFoundException("There are no children found at this level.");
+            }else {
+                return result;
+            }
+
+        }else {
+            for (String child : children) {
+                UOINode childNode = uoiRepository.findByUoi(child);
+                result.add(childNode);
+            }
+            return result;
+        }
+
+
+
+
+    }
+
+    public Object searchByUoiClass(String uoiClass) throws NodeNotFoundException {
+        ArrayList<UOINode> result = new ArrayList();
+        ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
+        if (nodes != null) {
+            for (UOINode node : nodes) {
+                if (StringUtils.hasText(node.getUoiClass())) {
+                    if (node.getUoiClass().equals(uoiClass)) {
+                        result.add(node);
+                    }
+                }
+            }
+        } else {
+            //TODO: DTO that returns when there are no nodes found.
+            log.warn("The database could be corrupted from testing with nested data");
+            throw new NodeNotFoundException("There are no nodes found following the requested criteria.");
+        }
+        //TODO: what to return
+        if (result.size()==0){
+            throw new NodeNotFoundException("There are no nodes that are classified as "+uoiClass);
+        }else {
+            return result;
+        }
 
     }
 
