@@ -27,10 +27,7 @@ public class NewUOIDTO {
 
     public NewUOIDTO(String countryCode, LEVEL level, String owner, String uoiClass, String parentUOI) throws ValidationErrorException {
         this.countryCode = countryCodeValidation(countryCode);
-        this.countryCode = countryCode;
-//        this.level = setLevel(level);
         this.owner = owner;
-        System.out.println("DTO owner: " + owner);
         this.level = level;
         this.uoiClass = uoiClass;
         this.parentUOI = parentUOI;
@@ -38,16 +35,12 @@ public class NewUOIDTO {
 
     public NewUOIDTO(String countryCode, LEVEL level, String owner, String uoiClass) throws ValidationErrorException {
         this.countryCode = countryCodeValidation(countryCode);
-        this.countryCode = countryCode;
-        //        this.level = setLevel(level);
         this.level = level;
         this.uoiClass = uoiClass;
     }
 
     public NewUOIDTO(String countryCode, LEVEL level, String owner) throws ValidationErrorException {
         this.countryCode = countryCodeValidation(countryCode);
-        this.countryCode = countryCode;
-        //        this.level = setLevel(level);
         this.level = level;
     }
 

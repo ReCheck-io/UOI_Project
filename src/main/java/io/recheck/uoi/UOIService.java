@@ -210,9 +210,6 @@ public class UOIService {
             return result;
         }
 
-
-
-
     }
 
     public Object searchByUoiClass(String uoiClass) throws NodeNotFoundException {
