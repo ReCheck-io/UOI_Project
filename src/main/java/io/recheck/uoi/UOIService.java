@@ -97,7 +97,7 @@ public class UOIService {
                 UOINode node = nodes.get(i);
                 if (node.getProperties() != null && !node.getProperties().isEmpty()) {
                     if (node.getProperties().containsKey(uoiSearchByPropertiesDTO.getKey())) {
-                        if (node.getProperties().get(uoiSearchByPropertiesDTO.getKey()).contains(uoiSearchByPropertiesDTO.getValue())) {
+                        if (node.getProperties().get(uoiSearchByPropertiesDTO.getKey()).equals(uoiSearchByPropertiesDTO.getValue())) {
                             result.add(node);
                             //is this the most efficient way ?
                             resultUOIOnly.add(new OnlyUOIDTO(node.getUoi()));
