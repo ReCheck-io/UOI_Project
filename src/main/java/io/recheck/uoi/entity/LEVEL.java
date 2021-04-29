@@ -8,4 +8,5 @@ public enum LEVEL {
     WALL,
     ELEMENT,
     PRODUCT_SAMPLE,
+    ROOF,
 }

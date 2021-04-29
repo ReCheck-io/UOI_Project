@@ -1,6 +1,14 @@
 package io.recheck.uoi;
 
+
+import io.recheck.uoi.dto.*;
+import io.recheck.uoi.exceptions.GeneralErrorException;
+import io.recheck.uoi.exceptionhandler.RestExceptionHandler;
+import io.recheck.uoi.exceptions.NodeNotFoundException;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import io.recheck.uoi.entity.LEVEL;
@@ -8,8 +16,12 @@ import io.recheck.uoi.entity.UOINode;
 
 import java.util.ArrayList;
 
+@Slf4j
 @RestController
 public class UOIController {
+
+    @Autowired
+    RestExceptionHandler restExceptionHandler;
 
     @Autowired
     UOIRepository uoiRepository;
@@ -18,118 +30,47 @@ public class UOIController {
     UOIService service;
 
     @Operation(summary = "Creating a new basic UOI without metadata.")
+    @Tag(name = "Create")
     @GetMapping("/new")
     public UOINode generateNewUOI(@RequestParam(value = "countryCode", defaultValue = "NL") String countryCode,
                                   @RequestParam(value = "level", defaultValue = "ROOM") LEVEL level,
+                                  @RequestParam(value = "owner", required = false) String owner,
                                   @RequestParam(value = "uoiClass", required = false) String uoiClass,
                                   @RequestParam(value = "parentUOI", required = false) String parentUOI) throws Exception {
-        return service.generateNewUOI(countryCode, level, uoiClass, parentUOI);
+        return service.generateNewUOI( new NewUOIDTO(countryCode, level, owner, uoiClass, parentUOI));
     }
 
     @Operation(summary = "Search for a UOI node by UOI or property.")
+    @Tag(name = "Search")
     @GetMapping("/search/uoi")
-    public Object getNodes(@RequestParam(value = "uoi") String uoi) {
+    public Object getNodes(@RequestParam(value = "uoi") String uoi) throws NodeNotFoundException {
         return service.search(uoi);
     }
 
     @Operation(summary = "adding properties to a node.")
+    @Tag(name = "Update")
     @PutMapping("/node/properties")
-    public UOINode putNodeProperties(@RequestParam(value = "uoi") String uoi,
-                                     @RequestParam(value = "key") String key,
-                                     @RequestParam(value = "value") String value) {
-        return service.putProperties(uoi, key, value);
-
+    public Object putNodeProperties(@RequestBody UOIPutRequestDTO uoiPutRequestDTO) throws NodeNotFoundException {
+        return service.putProperties(uoiPutRequestDTO);
     }
 
     @Operation(summary = "Search for UOI by existing properties.")
+    @Tag(name = "Search")
     @GetMapping("/search/properties")
-    public ArrayList getNodeByProps(@RequestParam(value = "key") String key,
+    public Object getNodeByProps(@RequestParam(value = "key") String key,
                                  @RequestParam(value = "value") String value,
-                                 @RequestParam(value = "withMetaData" , defaultValue = "false") boolean withMetaData){
+                                 @RequestParam(value = "withMetaData" , defaultValue = "false") boolean withMetaData) throws NodeNotFoundException {
 
-        return (ArrayList) service.searchByProperties(key, value, withMetaData);
 
+            return service.searchByProperties( new UOISearchByPropertiesDTO(key, value, withMetaData));
     }
 
-
-    //TODO: da napravq DTO s 2te id-ta i da se razpoznava tipa na vryzkata i da se napravi
-//    @PutMapping("/node")
-//    public String nodePartOfAnother(@RequestParam(value = "uoi") String uoi,
-//                                    @RequestParam(value = "uoiPartOf") String uoiPartOf) {
-//        int nodePlace = 999999999;
-//        int nodePlacePartOf = 999999999;
-//        ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
-//        for (int i = 0; i < nodes.size(); i++) {
-//            if (nodes.get(i).getUoi().equals(uoi)) {
-//                nodePlace = i;
-//            }
-//            if (nodes.get(i).getUoi().equals(uoiPartOf)) {
-//                nodePlacePartOf = i;
-//            }
-//        }
-//        if (nodePlace < 99999999) {
-//            if (nodePlacePartOf < 99999999) {
-//                nodes.get(nodePlacePartOf).partOf(nodes.get(nodePlace));
-//                uoiRepository.saveAll(nodes);
-//            }
-//        }
-//        ArrayList<UOINode> usedNodes = new ArrayList();
-//        usedNodes.add(nodes.get(nodePlacePartOf));
-//        usedNodes.add(nodes.get(nodePlace));
-//        return usedNodes.toString();
-//    }
-
-//    //TODO: da se razkara i da byde obedineno s gornoto
-//    @GetMapping("/node")
-//    public String nodeConsistedOfAnother(@RequestParam(value = "uuid") String uuid, @RequestParam(value = "uuidConsistedOf") String uuidConsistedOf) {
-//        int nodePlace = 999999999;
-//        int nodePlaceConsistedOf = 999999999;
-//        ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
-//        for (int i = 0; i < nodes.size(); i++) {
-//            if (nodes.get(i).getUoi().equals(uuidConsistedOf)) {
-//                nodePlaceConsistedOf = i;
-//            }
-//            if (nodes.get(i).getUoi().equals(uuid)) {
-//                nodePlace = i;
-//            }
-//        }
-//        if (nodePlace < 99999999) {
-//            if (nodePlaceConsistedOf < 99999999) {
-//                nodes.get(nodePlace).consistsOf(nodes.get(nodePlaceConsistedOf));
-//                uoiRepository.saveAll(nodes);
-//            }
-//        }
-//        ArrayList<UOINode> usedNodes = new ArrayList();
-//        usedNodes.add(nodes.get(nodePlaceConsistedOf));
-//        usedNodes.add(nodes.get(nodePlace));
-//        return usedNodes.toString();
-//    }
-//
-//    //TODO: da go razkaram i da vleze pri ostanalite za relationship
-//    @GetMapping("/node")
-//    public String nodeHistoryOfAnother(@RequestParam(value = "uoi") String uoi, @RequestParam(value = "uoiHistoryOf") String uoiHistoryOf) {
-//        int nodePlace = 999999999;
-//        int nodePlaceHistoryOf = 999999999;
-//        ArrayList<UOINode> nodes = (ArrayList<UOINode>) uoiRepository.findAll();
-//        for (int i = 0; i < nodes.size(); i++) {
-//            if (nodes.get(i).getUoi().equals(uoi)) {
-//                nodePlace = i;
-//            }
-//            if (nodes.get(i).getUoi().equals(uoiHistoryOf)) {
-//                nodePlaceHistoryOf = i;
-//            }
-//        }
-//        if (nodePlace < 99999999) {
-//            if (nodePlaceHistoryOf < 99999999) {
-//                nodes.get(nodePlaceHistoryOf).historyOf(nodes.get(nodePlace));
-//                uoiRepository.saveAll(nodes);
-//            }
-//        }
-//        ArrayList<UOINode> usedNodes = new ArrayList();
-//        usedNodes.add(nodes.get(nodePlaceHistoryOf));
-//        usedNodes.add(nodes.get(nodePlace));
-//        return usedNodes.toString();
-//    }
+    @Operation(summary = "Make a child-parent relationship between nodes.")
+    @Tag(name = "Update")
+    @PutMapping("/node/relationship")
+    public Object nodePartOfAnother(@RequestBody UOIRelationshipDTO uoiRelationshipDTO) throws NodeNotFoundException {
+        return service.makeRelationship(uoiRelationshipDTO);
+    }
 
 
     @PostMapping(path = "/newWithInformation", consumes = "application/json", produces = "application/json")
@@ -138,28 +79,65 @@ public class UOIController {
         return uoiNode;
     }
 
-    @GetMapping("/demoNodes")
-    public String executeDemoNode() {
-        uoiRepository.deleteAll();
-        service.demoNodes(uoiRepository);
-        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503104983629824/Untitled_Diagram1.png'/> " +
-                "</body></html>";
+    @Operation(summary = "Search for UOIs that are owned by user:")
+    @Tag(name = "Search")
+    @GetMapping(path = "/search/owner")
+    public Object getNodesByOwner(@RequestParam(value = "owner") String owner) throws NodeNotFoundException {
+        return service.searchByOwner(owner);
     }
 
-    @GetMapping("/scenarioCombine")
-    public String executeDemoNodeCombineTwoRooms() {
-        uoiRepository.deleteAll();
-        service.demoNodesCombineTwoRooms(uoiRepository);
-        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503102551064576/Untitled_Diagram3.png'/> " +
-                "</body></html>";
+    @Operation(summary = "Search for UOIs that are owned by user:")
+    @Tag(name = "Search")
+    @GetMapping(path = "/search/uoiClass")
+    public Object getNodesByUoiClass(@RequestParam(value = "uoiClass") String uoiClass) throws NodeNotFoundException {
+        return service.searchByUoiClass(uoiClass);
     }
 
+    @Operation(summary = "Retrieve information about the UOI's children, if Level provided, it will be level dependent.")
+    @Tag(name = "Retrieve")
+    @GetMapping(path = "/retrieve/uoi/children")
+    public ArrayList getNodeChildren(@RequestParam(value = "uoi") String uoi,
+                                     @RequestParam(value = "level" , required = false) LEVEL level) throws NodeNotFoundException {
+        return service.getNodeChildren( new GetChildrenDTO(uoi, level));
+    }
+
+    @Operation(summary = "Set the owner of the specific UOI node.")
+    @Tag(name = "Update")
+    @PutMapping(path = "/set/node/owner")
+    public Object setNodeOwner(@RequestBody SetNodeOwnerDTO setNodeOwnerDTO) throws NodeNotFoundException {
+       return service.setNodeOwner(setNodeOwnerDTO);
+    }
+
+    @Operation(summary = "The system and user are going to be sent to an external system to retrieve information.")
+    @Tag(name = "Requests for token")
+    @PostMapping(path = "/uoi")
+    public void requestAccess(@RequestBody RequestAccessDTO requestAccessDTO){
+        service.requestAccess(requestAccessDTO);
+    }
+//    @GetMapping("/demoNodes")
+//    public String executeDemoNode() {
+//        uoiRepository.deleteAll();
+//        service.demoNodes(uoiRepository);
+//        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503104983629824/Untitled_Diagram1.png'/> " +
+//                "</body></html>";
+//    }
+//
+//    @GetMapping("/scenarioCombine")
+//    public String executeDemoNodeCombineTwoRooms() {
+//        uoiRepository.deleteAll();
+//        service.demoNodesCombineTwoRooms(uoiRepository);
+//        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503102551064576/Untitled_Diagram3.png'/> " +
+//                "</body></html>";
+//    }
+
+    @Hidden
     @GetMapping("/clearDB")
     public String clearDB() {
         uoiRepository.deleteAll();
         return "DB has been cleared!";
     }
 
+    @Hidden
     @GetMapping("/")
     public String error() {
         return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/675683560673509389/776827370161700874/addtext_com_MTAwMTI1MzExODY.jpg'/> " +
@@ -167,13 +145,13 @@ public class UOIController {
 
     }
 
-    @GetMapping("/scenarioAddANewRoom")
-    public String executeDemoNodeAddANewRoom() {
-        uoiRepository.deleteAll();
+//    @GetMapping("/scenarioAddANewRoom")
+//    public String executeDemoNodeAddANewRoom() {
+//        uoiRepository.deleteAll();
 //        service.demoNodesAddANewRoom(uoiRepository);
-        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503092572553226/Untitled_Diagram4.png'/> " +
-                "</body></html>";
-    }
+//        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503092572553226/Untitled_Diagram4.png'/> " +
+//                "</body></html>";
+//    }
 
 
 

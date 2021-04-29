@@ -1,23 +1,25 @@
 package io.recheck.uoi.entity;
 
-import org.neo4j.ogm.annotation.EndNode;
-import org.neo4j.ogm.annotation.GeneratedValue;
-import org.neo4j.ogm.annotation.Id;
-import org.neo4j.ogm.annotation.StartNode;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.neo4j.ogm.annotation.*;
 
+@Data
+@NoArgsConstructor
+@RelationshipEntity(type = "HISTORY_OF")
 public class HistoryOf {
     @Id
     @GeneratedValue
     private long id;
 
-    String timestamp;
+    private String timestamp;
+    private boolean validated;
+    private String validator;
 
     @StartNode
     private UOINode uoiNodePartOf;
 
     @EndNode
     private UOINode uoiNode;
-
-    public HistoryOf(){}
 
 }
