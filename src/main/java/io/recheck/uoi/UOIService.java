@@ -6,12 +6,14 @@ import io.recheck.uoi.exceptions.GeneralErrorException;
 import io.recheck.uoi.exceptionhandler.RestExceptionHandler;
 import io.recheck.uoi.exceptions.NodeNotFoundException;
 import io.recheck.uoi.exceptions.ValidationErrorException;
+import io.recheck.uoi.restclient.RestClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import io.recheck.uoi.entity.LEVEL;
 import io.recheck.uoi.entity.UOINode;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -26,6 +28,77 @@ public class UOIService {
 
     @Autowired
     UOIRepository uoiRepository;
+
+    RestClient restClient = new RestClient();
+
+    String ddcUrl = "http://dev-services.xl-websolutions.nl/scripts/amwebconnector.dll/~cirdax/getwebdocument";
+//
+//    Test URLS:
+//
+//    /RequestUoiAccessToken?UoiId=NL.9c7c4070-8bf4-4788-8c2c-3490713336c8&UoiRequestorCode=TEST&UoiRequestorName=Test-Name
+//
+//    Antwoord: {"UoiAccessToken":"6944035EEBB2CD4EBE0F6603578BE62DD3AEBDAC978F5B079E1921F713302CDB"}
+//
+//    /CheckUoiAccessToken?UoiId=NL.9c7c4070-8bf4-4788-8c2c-3490713336c8&UoiAccessToken=6944035EEBB2CD4EBE0F6603578BE62DD3AEBDAC978F5B079E1921F713302CDB
+//
+//    {"AccessTokenState":"Requested"}
+//
+//    /UoiQueryDocuments?UoiId=NL.9c7c4070-8bf4-4788-8c2c-3490713336c8&UoiAccessToken=6944035EEBB2CD4EBE0F6603578BE62DD3AEBDAC978F5B079E1921F713302CDB
+//
+//
+//    {"AccessTokenState":"Requested"}
+//
+//
+//
+//    /UoiQueryDocuments?UoiId=NL.faa24612-e110-4b4b-a7de-b47d2df37779&UoiAccessToken=8BDCD097B6FD740EF002F25A0A7D1AD7BCDF6BCEFBD218236EC4F9298C9FF297
+//
+//
+//
+//    {{"DocumentId":"{9db88288-df27-4485-a6d2-187c1a3cd2f6}","DocumentFileName":"40000100000001.001.pdf","DocumentType":"pdf","DocumentTypeName":"Co2ProjectObject"},{"DocumentId":"{d45b54b2-c529-4f0e-92bf-5a93c72c6db3}","DocumentFileName":"40000100000002.001.pdf","DocumentType":"pdf","DocumentTypeName":"Product"}}
+//
+//
+//
+//    /GetUoiDocument?DocumentId={9db88288-df27-4485-a6d2-187c1a3cd2f6}&UoiAccessToken=8BDCD097B6FD740EF002F25A0A7D1AD7BCDF6BCEFBD218236EC4F9298C9FF297&UoiId=NL.faa24612-e110-4b4b-a7de-b47d2df37779
+
+
+    public void queryForSingleDocument(GetDocumentDTO getDocumentDTO) {
+
+        String url = ddcUrl + "/GetUoiDocument?DocumentId="+ getDocumentDTO.getDocumentId()+"&UoiAccessToken=" + getDocumentDTO.getToken()+"&UoiId=" + getDocumentDTO.getUoi();
+        String testUrl = ddcUrl + "/GetUoiDocument?DocumentId={9db88288-df27-4485-a6d2-187c1a3cd2f6}&UoiAccessToken=8BDCD097B6FD740EF002F25A0A7D1AD7BCDF6BCEFBD218236EC4F9298C9FF297&UoiId=NL.faa24612-e110-4b4b-a7de-b47d2df37779";
+        System.out.println(testUrl);
+        String result = restClient.get(testUrl);
+
+        System.out.println(result);
+    }
+
+
+    public void queryForDocuments(CheckTokenDTO checkTokenDTO) {
+        String url = ddcUrl + "/UoiQueryDocuments?UoiId=" + checkTokenDTO.getUoi() + "&UoiAccessToken=" + checkTokenDTO.getToken();
+        String testUrl = ddcUrl + "/UoiQueryDocuments?UoiId=NL.9c7c4070-8bf4-4788-8c2c-3490713336c8&UoiAccessToken=6944035EEBB2CD4EBE0F6603578BE62DD3AEBDAC978F5B079E1921F713302CDB";
+        System.out.println(testUrl);
+        String result = restClient.get(testUrl);
+
+        System.out.println(result);
+    }
+
+    public void checkToken(CheckTokenDTO checkTokenDTO) {
+        String url = ddcUrl + "/CheckUoiAccessToken?UoiId=" + checkTokenDTO.getUoi() + "&UoiAccessToken=" + checkTokenDTO.getToken();
+        String testUrl = ddcUrl + "/CheckUoiAccessToken?UoiId=NL.9c7c4070-8bf4-4788-8c2c-3490713336c8&UoiAccessToken=6944035EEBB2CD4EBE0F6603578BE62DD3AEBDAC978F5B079E1921F713302CDB";
+        System.out.println(testUrl);
+        String result = restClient.get(testUrl);
+
+        System.out.println(result);
+    }
+
+    public void requestToken(RequestAccessDTO requestAccessDTO) {
+        String url = ddcUrl + "/RequestUoiAccessToken?UoiId=" + requestAccessDTO.getUoi() + "&UoiRequestorCode=" + requestAccessDTO.getSystemId()
+                + "&UoiRequestorName=" + requestAccessDTO.getUserId();
+        String ddcTest = ddcUrl + "/RequestUoiAccessToken?UoiId=NL.9c7c4070-8bf4-4788-8c2c-3490713336c8&UoiRequestorCode=TEST&UoiRequestorName=Test-Name";
+        System.out.println("url: " + url);
+        System.out.println("Test Url: " + ddcTest);
+        String result = restClient.get(url);
+        System.out.println("tova " + result);
+    }
 
     public UOINode generateNewUOI(NewUOIDTO newUOIDTO) throws Exception {
         UOINode node = null;
@@ -56,7 +129,6 @@ public class UOIService {
     public Object search(String uoi) throws NodeNotFoundException {
         UOINode node = uoiRepository.findByUoi(uoi);
         if (node != null) {
-            System.out.println(node);
             return node;
         } else {
             throw new NodeNotFoundException();
@@ -80,9 +152,9 @@ public class UOIService {
             throw new NodeNotFoundException("There are no nodes found following the requested criteria.");
         }
         //TODO: what to return
-        if (result.size()==0){
-            throw new NodeNotFoundException("There are no nodes that are owned by "+owner);
-        }else {
+        if (result.size() == 0) {
+            throw new NodeNotFoundException("There are no nodes that are owned by " + owner);
+        } else {
             return result;
         }
 
@@ -178,31 +250,31 @@ public class UOIService {
         }
     }
 
-    public void requestAccess(RequestAccessDTO requestAccessDTO){
+    public void requestAccess(RequestAccessDTO requestAccessDTO) {
 
     }
 
     public ArrayList getNodeChildren(GetChildrenDTO getChildrenDTO) throws NodeNotFoundException {
         ArrayList<UOINode> result = new ArrayList<>();
         UOINode node = uoiRepository.findByUoi(getChildrenDTO.getUoi());
-        if (node == null){
+        if (node == null) {
             throw new NodeNotFoundException("The node has not been found in the database.");
         }
         List<String> children = node.getChildren();
-        if (getChildrenDTO.getLevel() != null){
+        if (getChildrenDTO.getLevel() != null) {
             for (String child : children) {
                 UOINode childNode = uoiRepository.findByUoi(child);
                 if (childNode.getLevel().equals(getChildrenDTO.getLevel())) {
                     result.add(childNode);
                 }
             }
-            if (result.size()==0){
+            if (result.size() == 0) {
                 throw new NodeNotFoundException("There are no children found at this level.");
-            }else {
+            } else {
                 return result;
             }
 
-        }else {
+        } else {
             for (String child : children) {
                 UOINode childNode = uoiRepository.findByUoi(child);
                 result.add(childNode);
@@ -229,9 +301,9 @@ public class UOIService {
             throw new NodeNotFoundException("There are no nodes found following the requested criteria.");
         }
         //TODO: what to return
-        if (result.size()==0){
-            throw new NodeNotFoundException("There are no nodes that are classified as "+uoiClass);
-        }else {
+        if (result.size() == 0) {
+            throw new NodeNotFoundException("There are no nodes that are classified as " + uoiClass);
+        } else {
             return result;
         }
 

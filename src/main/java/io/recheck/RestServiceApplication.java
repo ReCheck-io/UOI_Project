@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @OpenAPIDefinition(servers = {
         @Server(url = "https://uoi.recheck.io/", description = "ReCheck UOI"),
+        @Server(url = "https://uoi-exp.recheck.io/", description = "ReCheck UOI Experimental"),
         @Server(url = "http://localhost:8080/", description = "localhost")
 })
 @SpringBootApplication

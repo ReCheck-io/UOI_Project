@@ -113,6 +113,30 @@ public class UOIController {
     public void requestAccess(@RequestBody RequestAccessDTO requestAccessDTO){
         service.requestAccess(requestAccessDTO);
     }
+
+    @Tag(name = "Test")
+    @GetMapping(path = "/testCheckToken")
+    public void testCheck(){
+        service.checkToken(new CheckTokenDTO("uoi", "token"));
+    }
+
+    @Tag(name = "Test")
+    @GetMapping(path = "/testRequestToken")
+    public void testRequest(@RequestParam(value = "uoi") String uoi){
+        service.requestToken(new RequestAccessDTO(uoi, "systemID","userId"));
+    }
+
+    @Tag(name = "Test")
+    @GetMapping(path = "/testQueryDocuments")
+    public void testRequestDocuments(){
+        service.queryForDocuments(new CheckTokenDTO("uoi", "token"));
+    }
+
+    @Tag(name = "Test")
+    @GetMapping(path = "/testQuerySingleDocument")
+    public void testRequestSigleDocument(){
+        service.queryForSingleDocument(new GetDocumentDTO("uoi", "token", "document"));
+         }
 //    @GetMapping("/demoNodes")
 //    public String executeDemoNode() {
 //        uoiRepository.deleteAll();
