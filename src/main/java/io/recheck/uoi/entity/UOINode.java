@@ -20,7 +20,6 @@ public class UOINode {
     private String uoi;
     @Properties
     private Map<String, String> properties;
-
     private String timestamp;
     private String owner;
     private String parentUOI = null;
@@ -100,6 +99,7 @@ public class UOINode {
             this.properties = new HashMap();
             this.properties.put(key, value);
         }
+
     }
 
 
