@@ -61,6 +61,7 @@ public class UOIController {
                                  @RequestParam(value = "value") String value,
                                  @RequestParam(value = "withMetaData" , defaultValue = "false") boolean withMetaData) throws NodeNotFoundException {
 
+
             return service.searchByProperties( new UOISearchByPropertiesDTO(key, value, withMetaData));
     }
 
