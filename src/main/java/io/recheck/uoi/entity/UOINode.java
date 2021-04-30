@@ -3,8 +3,8 @@ package io.recheck.uoi.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
-import org.neo4j.ogm.annotation.*;
 import org.neo4j.ogm.annotation.Properties;
+import org.neo4j.ogm.annotation.*;
 
 import java.util.*;
 

@@ -2,7 +2,8 @@ package io.recheck.uoi;
 
 
 import io.recheck.uoi.dto.*;
-import io.recheck.uoi.exceptions.GeneralErrorException;
+import io.recheck.uoi.entity.LEVEL;
+import io.recheck.uoi.entity.UOINode;
 import io.recheck.uoi.exceptionhandler.RestExceptionHandler;
 import io.recheck.uoi.exceptions.NodeNotFoundException;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -11,8 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import io.recheck.uoi.entity.LEVEL;
-import io.recheck.uoi.entity.UOINode;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
