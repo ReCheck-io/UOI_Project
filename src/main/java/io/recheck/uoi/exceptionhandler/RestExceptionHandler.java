@@ -34,6 +34,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(NodeNotFoundException.class)
     public ResponseEntity<Object> handleNNFError(Exception ex) {
+        logger.error("", ex);
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
         apiError.setMessage(String.format("This node is not existing in the database."));
         apiError.setDebugMessage(ex.getMessage());
@@ -42,6 +43,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGeneralError(Exception ex) {
+        logger.error("", ex);
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
         apiError.setMessage(String.format("Something went wrong, see the debug message for more."));
         ex.printStackTrace();
@@ -51,6 +53,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ValidationErrorException.class)
     public ResponseEntity<Object> handleValidationError(Exception ex) {
+        logger.error("", ex);
         ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE);
         apiError.setMessage("A validation error has been encountered.");
         apiError.setDebugMessage(ex.getLocalizedMessage());
@@ -59,6 +62,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> handleIllegalArgumentError(Exception ex) {
+        logger.error("", ex);
         ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE);
         apiError.setMessage("A validation error has been encountered.");
         apiError.setDebugMessage(ex.getLocalizedMessage());
