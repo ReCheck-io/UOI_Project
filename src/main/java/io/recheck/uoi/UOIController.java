@@ -40,7 +40,7 @@ public class UOIController {
         return service.generateNewUOI( new NewUOIDTO(countryCode, level, owner, uoiClass, parentUOI));
     }
 
-    @Operation(summary = "Search for a UOI node by UOI or property.")
+    @Operation(summary = "Search for a UOI node.")
     @Tag(name = "Search")
     @GetMapping("/search/uoi")
     public Object getNodes(@RequestParam(value = "uoi") String uoi) throws NodeNotFoundException {
@@ -116,9 +116,9 @@ public class UOIController {
     }
 
     @Tag(name = "Test")
-    @GetMapping(path = "/testCheckToken")
-    public void testCheck(){
-        service.checkToken(new CheckTokenDTO("uoi", "token"));
+    @PutMapping(path = "/registerAnEndpoint")
+    public void registerEndPoint(@RequestBody RegisterEndPointUOI registerEndPointUOI)  {
+        service.registerEndPoint(registerEndPointUOI);
     }
 
     @Tag(name = "Test")

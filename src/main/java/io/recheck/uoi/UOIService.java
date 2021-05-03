@@ -1,21 +1,16 @@
 package io.recheck.uoi;
 
 import io.recheck.uoi.dto.*;
-import io.recheck.uoi.entity.ConsistsOf;
-import io.recheck.uoi.exceptions.GeneralErrorException;
 import io.recheck.uoi.exceptionhandler.RestExceptionHandler;
 import io.recheck.uoi.exceptions.NodeNotFoundException;
-import io.recheck.uoi.exceptions.ValidationErrorException;
+import io.recheck.uoi.rdbms.UOIRDB;
 import io.recheck.uoi.restclient.RestClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import io.recheck.uoi.entity.LEVEL;
 import io.recheck.uoi.entity.UOINode;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 @Slf4j
@@ -28,6 +23,8 @@ public class UOIService {
 
     @Autowired
     UOIRepository uoiRepository;
+
+    UOIRDB uoirdb = new UOIRDB();
 
     RestClient restClient = new RestClient();
 
@@ -81,13 +78,8 @@ public class UOIService {
         System.out.println(result);
     }
 
-    public void checkToken(CheckTokenDTO checkTokenDTO) {
-        String url = ddcUrl + "/CheckUoiAccessToken?UoiId=" + checkTokenDTO.getUoi() + "&UoiAccessToken=" + checkTokenDTO.getToken();
-        String testUrl = ddcUrl + "/CheckUoiAccessToken?UoiId=NL.9c7c4070-8bf4-4788-8c2c-3490713336c8&UoiAccessToken=6944035EEBB2CD4EBE0F6603578BE62DD3AEBDAC978F5B079E1921F713302CDB";
-        System.out.println(testUrl);
-        String result = restClient.get(testUrl);
-
-        System.out.println(result);
+    public void registerEndPoint(RegisterEndPointUOI registerEndPointUOI) {
+        uoirdb.insertIntoSystems(registerEndPointUOI.getSystem(),registerEndPointUOI.getUrl(),registerEndPointUOI.getType());
     }
 
     public void requestToken(RequestAccessDTO requestAccessDTO) {
