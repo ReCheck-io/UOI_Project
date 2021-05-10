@@ -1,9 +1,17 @@
 spring:
  data:
   neo4j:
-#    uri: neo4j+s://uoi-admin.recheck.io:7474
     username: neo4j
     password: test
+# jpa:
+#   hibernate:
+#     ddl-auto: update
+#     show-sql: true
+# datasource:
+#  driver-class-name: com.mysql.cj.jdbc.Driver
+#  url: jdbc:mysql://localhost:3306/uoi_backend
+#  username: Dakata
+#  password: test
 
 springdoc:
  api-docs:

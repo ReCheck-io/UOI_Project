@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import io.recheck.uoi.entity.LEVEL;
 import io.recheck.uoi.entity.UOINode;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 @Slf4j
@@ -26,6 +27,9 @@ public class UOIController {
     @Autowired
     UOIRepository uoiRepository;
 
+//    @Autowired
+//    SystemsRepository systemsRepository;
+
     @Autowired
     UOIService service;
 
@@ -37,7 +41,7 @@ public class UOIController {
                                   @RequestParam(value = "owner", required = false) String owner,
                                   @RequestParam(value = "uoiClass", required = false) String uoiClass,
                                   @RequestParam(value = "parentUOI", required = false) String parentUOI) throws Exception {
-        return service.generateNewUOI( new NewUOIDTO(countryCode, level, owner, uoiClass, parentUOI));
+        return service.generateNewUOI(new NewUOIDTO(countryCode, level, owner, uoiClass, parentUOI));
     }
 
     @Operation(summary = "Search for a UOI node.")
@@ -59,10 +63,10 @@ public class UOIController {
     @GetMapping("/search/properties")
     public Object getNodeByProps(@RequestParam(value = "key") String key,
                                  @RequestParam(value = "value") String value,
-                                 @RequestParam(value = "withMetaData" , defaultValue = "false") boolean withMetaData) throws NodeNotFoundException {
+                                 @RequestParam(value = "withMetaData", defaultValue = "false") boolean withMetaData) throws NodeNotFoundException {
 
 
-            return service.searchByProperties( new UOISearchByPropertiesDTO(key, value, withMetaData));
+        return service.searchByProperties(new UOISearchByPropertiesDTO(key, value, withMetaData));
     }
 
     @Operation(summary = "Make a child-parent relationship between nodes.")
@@ -97,47 +101,59 @@ public class UOIController {
     @Tag(name = "Retrieve")
     @GetMapping(path = "/retrieve/uoi/children")
     public ArrayList getNodeChildren(@RequestParam(value = "uoi") String uoi,
-                                     @RequestParam(value = "level" , required = false) LEVEL level) throws NodeNotFoundException {
-        return service.getNodeChildren( new GetChildrenDTO(uoi, level));
+                                     @RequestParam(value = "level", required = false) LEVEL level) throws NodeNotFoundException {
+        return service.getNodeChildren(new GetChildrenDTO(uoi, level));
     }
 
     @Operation(summary = "Set the owner of the specific UOI node.")
     @Tag(name = "Update")
     @PutMapping(path = "/set/node/owner")
     public Object setNodeOwner(@RequestBody SetNodeOwnerDTO setNodeOwnerDTO) throws NodeNotFoundException {
-       return service.setNodeOwner(setNodeOwnerDTO);
+        return service.setNodeOwner(setNodeOwnerDTO);
     }
 
     @Operation(summary = "The system and user are going to be sent to an external system to retrieve information.")
     @Tag(name = "Requests for token")
     @PostMapping(path = "/uoi")
-    public void requestAccess(@RequestBody RequestAccessDTO requestAccessDTO){
+    public void requestAccess(@RequestBody RequestAccessDTO requestAccessDTO) {
         service.requestAccess(requestAccessDTO);
     }
 
     @Tag(name = "Test")
     @PutMapping(path = "/registerAnEndpoint")
-    public void registerEndPoint(@RequestBody RegisterEndPointUOI registerEndPointUOI)  {
+    public void registerEndPoint(@RequestBody RegisterEndPointUOI registerEndPointUOI) {
         service.registerEndPoint(registerEndPointUOI);
     }
 
-    @Tag(name = "Test")
-    @GetMapping(path = "/testRequestToken")
-    public void testRequest(@RequestParam(value = "uoi") String uoi){
-        service.requestToken(new RequestAccessDTO(uoi, "systemID","userId"));
+    @Tag(name = "ExternalSystemAccess")
+    @GetMapping(path = "/requestToken")
+    public Object testRequest(@RequestParam(value = "uoi") String uoi,
+                              @RequestParam(value = "systemId") String systemId,
+                              @RequestParam(value = "userId") String userId) {
+        return service.requestToken(new RequestAccessDTO(uoi, systemId, userId));
+    }
+
+    @Tag(name = "ExternalSystemAccess")
+    @GetMapping(path = "/checkToken")
+    public Object checkRequest(@RequestParam(value = "uoi") String uoi,
+                               @RequestParam(value = "userId") String userId,
+                               @RequestParam(value = "token") String token) {
+        return service.checkToken(new CheckTokenDTO(uoi, userId, token));
+    }
+
+
+    @Tag(name = "ExternalSystemAccess")
+    @GetMapping(path = "/queryDocuments")
+    public Object testRequestDocuments(@RequestParam(value = "uoi") String uoi,
+                                       @RequestParam(value = "token") String token) {
+        return service.queryForDocuments(new AccessTokenDTO(uoi, token));
     }
 
     @Tag(name = "Test")
-    @GetMapping(path = "/testQueryDocuments")
-    public void testRequestDocuments(){
-        service.queryForDocuments(new CheckTokenDTO("uoi", "token"));
-    }
-
-    @Tag(name = "Test")
-    @GetMapping(path = "/testQuerySingleDocument")
-    public void testRequestSigleDocument(){
+    @GetMapping(path = "/querySingleDocument")
+    public void testRequestSigleDocument() {
         service.queryForSingleDocument(new GetDocumentDTO("uoi", "token", "document"));
-         }
+    }
 //    @GetMapping("/demoNodes")
 //    public String executeDemoNode() {
 //        uoiRepository.deleteAll();
@@ -176,7 +192,6 @@ public class UOIController {
 //        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503092572553226/Untitled_Diagram4.png'/> " +
 //                "</body></html>";
 //    }
-
 
 
 }

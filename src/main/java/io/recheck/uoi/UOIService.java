@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import io.recheck.uoi.entity.UOINode;
 import org.springframework.util.StringUtils;
 
+import java.sql.SQLException;
 import java.util.*;
 
 @Slf4j
@@ -21,8 +22,13 @@ public class UOIService {
     @Autowired
     RestExceptionHandler restExceptionHandler;
 
+//    @Autowired
+//    SystemsRepository systemsRepository;
+
     @Autowired
     UOIRepository uoiRepository;
+
+//    Systems systemsrdb = new Systems();
 
     UOIRDB uoirdb = new UOIRDB();
 
@@ -58,10 +64,19 @@ public class UOIService {
 //    /GetUoiDocument?DocumentId={9db88288-df27-4485-a6d2-187c1a3cd2f6}&UoiAccessToken=8BDCD097B6FD740EF002F25A0A7D1AD7BCDF6BCEFBD218236EC4F9298C9FF297&UoiId=NL.faa24612-e110-4b4b-a7de-b47d2df37779
 
 
+//    public void test() {
+//     List<Systems> result = systemsRepository.findAll();
+//        for (Systems systems : result) {
+//            log.info(" ", systems);
+//            System.out.println(systems);
+//        }
+//
+//    }
+
     public void queryForSingleDocument(GetDocumentDTO getDocumentDTO) {
 
         String url = ddcUrl + "/GetUoiDocument?DocumentId="+ getDocumentDTO.getDocumentId()+"&UoiAccessToken=" + getDocumentDTO.getToken()+"&UoiId=" + getDocumentDTO.getUoi();
-        String testUrl = ddcUrl + "/GetUoiDocument?DocumentId={9db88288-df27-4485-a6d2-187c1a3cd2f6}&UoiAccessToken=8BDCD097B6FD740EF002F25A0A7D1AD7BCDF6BCEFBD218236EC4F9298C9FF297&UoiId=NL.faa24612-e110-4b4b-a7de-b47d2df37779";
+        String testUrl = ddcUrl + "/GetUoiDocument?DocumentId={224b9490-dd5e-4679-a198-b2d181171b74}&UoiAccessToken=475B3801E59A4FF4FD25E312D6912F713237685C03328A6EC972FB8E3175423C&DocumentType=xml&UoiId=NL.15b1752d-5900-4742-8b2c-03e3f6c583a1";
         System.out.println(testUrl);
         String result = restClient.get(testUrl);
 
@@ -69,27 +84,38 @@ public class UOIService {
     }
 
 
-    public void queryForDocuments(CheckTokenDTO checkTokenDTO) {
-        String url = ddcUrl + "/UoiQueryDocuments?UoiId=" + checkTokenDTO.getUoi() + "&UoiAccessToken=" + checkTokenDTO.getToken();
+    public Object queryForDocuments(AccessTokenDTO accessTokenDTO) {
+        String url = ddcUrl + "/UoiQueryDocuments?UoiId=" + accessTokenDTO.getUoi() + "&UoiAccessToken=" + accessTokenDTO.getToken();
         String testUrl = ddcUrl + "/UoiQueryDocuments?UoiId=NL.9c7c4070-8bf4-4788-8c2c-3490713336c8&UoiAccessToken=6944035EEBB2CD4EBE0F6603578BE62DD3AEBDAC978F5B079E1921F713302CDB";
         System.out.println(testUrl);
-        String result = restClient.get(testUrl);
+        String result = restClient.get(url);
 
-        System.out.println(result);
+        return result;
     }
 
     public void registerEndPoint(RegisterEndPointUOI registerEndPointUOI) {
         uoirdb.insertIntoSystems(registerEndPointUOI.getSystem(),registerEndPointUOI.getUrl(),registerEndPointUOI.getType());
     }
 
-    public void requestToken(RequestAccessDTO requestAccessDTO) {
+    public Object requestToken(RequestAccessDTO requestAccessDTO) {
         String url = ddcUrl + "/RequestUoiAccessToken?UoiId=" + requestAccessDTO.getUoi() + "&UoiRequestorCode=" + requestAccessDTO.getSystemId()
                 + "&UoiRequestorName=" + requestAccessDTO.getUserId();
-        String ddcTest = ddcUrl + "/RequestUoiAccessToken?UoiId=NL.9c7c4070-8bf4-4788-8c2c-3490713336c8&UoiRequestorCode=TEST&UoiRequestorName=Test-Name";
+        String ddcTest = ddcUrl + "/RequestUoiAccessToken?UoiId=NL.15b1752d-5900-4742-8b2c-03e3f6c583a1&UoiRequestorCode=XLB&UoiRequestorName=XL-BusinessSolutions";
         System.out.println("url: " + url);
         System.out.println("Test Url: " + ddcTest);
         String result = restClient.get(url);
-        System.out.println("tova " + result);
+        return result;
+    }
+
+    public Object checkToken(CheckTokenDTO requestAccessDTO) {
+        String url = ddcUrl + "/CheckUoiAccessToken?UoiId=" + requestAccessDTO.getUoi() + "&UoiRequestorCode=" + requestAccessDTO.getUser()
+                + "&UoiAccessToken=" + requestAccessDTO.getToken();
+        String ddcTest = ddcUrl + "/CheckUoiAccessToken?UoiId=NL.15b1752d-5900-4742-8b2c-03e3f6c583a1&UoiRequestorCode=XL-BusinessSolutions&UoiAccessToken=475B3801E59A4FF4FD25E312D6912F713237685C03328A6EC972FB8E3175423C";
+        System.out.println("url: " + url);
+        System.out.println("Test Url: " + ddcTest);
+        String result = restClient.get(url);
+
+        return result;
     }
 
     public UOINode generateNewUOI(NewUOIDTO newUOIDTO) throws Exception {
@@ -300,6 +326,8 @@ public class UOIService {
         }
 
     }
+
+
 
 
 //
