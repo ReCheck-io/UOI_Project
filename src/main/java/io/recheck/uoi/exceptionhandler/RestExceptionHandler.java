@@ -44,6 +44,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleGeneralError(Exception ex) {
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
         apiError.setMessage(String.format("Something went wrong, see the debug message for more."));
+        ex.printStackTrace();
         apiError.setDebugMessage(ex.getLocalizedMessage());
         return buildResponseEntity(apiError);
     }
