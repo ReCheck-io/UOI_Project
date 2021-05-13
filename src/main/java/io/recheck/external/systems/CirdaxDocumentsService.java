@@ -22,20 +22,17 @@ import java.util.Map;
 @Service
 public class CirdaxDocumentsService {
 
-    private final String TOKEN = "FB795A9EA62078B5A62AF0263EE6D8AC1E20E7813F13DEDEFAEADC35C962046A";
-//    private final String TOKEN = "BB39CE8D69265BCE0A0629FE4C1C4FC8D83C2230717A25D114AD14219776E618"; // "accessTokenState": "Requested"
-    private final String UOI = "NL.b6372870-d4c5-45a6-adc7-b629e0df12a8";
-
     private final RestClientService restClientService;
-    private final Map<CirdaxResourcesEnum, String> cirdaxProfileResourcesMap;
+    private final CirdaxProfileService cirdaxProfileService;
 
     public CirdaxDocumentsService(RestClientService restClientService, CirdaxProfileService cirdaxProfileService) {
         this.restClientService = restClientService;
-        this.cirdaxProfileResourcesMap = cirdaxProfileService.getCirdaxResourcesMap();
+        this.cirdaxProfileService = cirdaxProfileService;
     }
 
     public CirdaxDocumentsResponseDTO requestAccessOrQueryDocuments(CirdaxDocumentsRequestAccessDTO dto) throws GeneralErrorException, JsonProcessingException {
-        String addressForQueryDocuments = getAddressForQueryDocuments(UOI, TOKEN);
+        String token = requestUoiAccessToken(dto);
+        String addressForQueryDocuments = getAddressForQueryDocuments(dto.getUoi(), token);
         ResponseEntity<String> responseEntityDocuments = restClientService.get(addressForQueryDocuments);
         if (responseEntityDocuments.getStatusCode() != HttpStatus.OK) {
             throw new GeneralErrorException(responseEntityDocuments.getBody());
@@ -50,7 +47,7 @@ public class CirdaxDocumentsService {
         }
         else {
             List<CirdaxDocumentsDTO> cirdaxDocumentsDTOS = objectMapper.readValue(responseEntityDocuments.getBody(), new TypeReference<List<CirdaxDocumentsDTO>>() {});
-            cirdaxDocumentsDTOS.forEach(c -> c.setDeepLinkUrl(getAddressForDocuments(c.getDeepLinkUrl(), UOI, TOKEN, c.getDocumentId())));
+            cirdaxDocumentsDTOS.forEach(c -> c.setDeepLinkUrl(getAddressForDocuments(c.getDeepLinkUrl(), dto.getUoi(), token, c.getDocumentId())));
             return new CirdaxDocumentsResponseDTO(null, cirdaxDocumentsDTOS);
         }
     }
@@ -70,8 +67,9 @@ public class CirdaxDocumentsService {
     }
 
     private String getAddressForRequestToken(String uoi, String requestorCode, String requestorName) {
+        Map<CirdaxResourcesEnum, String> map = cirdaxProfileService.getCirdaxResourcesMap();
         UriComponentsBuilder builder =
-                UriComponentsBuilder.fromHttpUrl(cirdaxProfileResourcesMap.get(CirdaxResourcesEnum.RequestUoiAccessToken));
+                UriComponentsBuilder.fromHttpUrl(map.get(CirdaxResourcesEnum.RequestUoiAccessToken));
 
         builder.replaceQueryParam(CirdaxResourcesParams.UoiId.name(), uoi);
         builder.replaceQueryParam(CirdaxResourcesParams.UoiRequestorCode.name(), requestorCode);
@@ -81,8 +79,9 @@ public class CirdaxDocumentsService {
     }
 
     private String getAddressForQueryDocuments(String uoi, String accessToken) {
+        Map<CirdaxResourcesEnum, String> map = cirdaxProfileService.getCirdaxResourcesMap();
         UriComponentsBuilder builder =
-                UriComponentsBuilder.fromHttpUrl(cirdaxProfileResourcesMap.get(CirdaxResourcesEnum.UoiQueryDocuments));
+                UriComponentsBuilder.fromHttpUrl(map.get(CirdaxResourcesEnum.UoiQueryDocuments));
 
         builder.replaceQueryParam(CirdaxResourcesParams.UoiId.name(), uoi);
         builder.replaceQueryParam(CirdaxResourcesParams.UoiAccessToken.name(), accessToken);
@@ -91,7 +90,8 @@ public class CirdaxDocumentsService {
     }
 
     private String getAddressForDocuments(String uoi, String accessToken, String documentId) {
-        return getAddressForDocuments(cirdaxProfileResourcesMap.get(CirdaxResourcesEnum.GetUoiDocument), uoi, accessToken, documentId);
+        Map<CirdaxResourcesEnum, String> map = cirdaxProfileService.getCirdaxResourcesMap();
+        return getAddressForDocuments(map.get(CirdaxResourcesEnum.GetUoiDocument), uoi, accessToken, documentId);
     }
 
     private String getAddressForDocuments(String httpUrl, String uoi, String accessToken, String documentId) {

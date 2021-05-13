@@ -2,7 +2,9 @@ package io.recheck.external.systems;
 
 
 import io.recheck.external.systems.dto.CirdaxProfileDTO;
+import io.recheck.uoi.dto.RegisterEndPointUOI;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,6 +33,11 @@ public class SystemProfilesController {
     @PostMapping(path = "/system/profile/cirdax", consumes = "application/json", produces = "application/json")
     public void saveCirdaxProfile(@RequestBody @Valid CirdaxProfileDTO cirdaxProfileDTO) {
         cirdaxProfileService.save(cirdaxProfileDTO);
+    }
+
+    @PutMapping(path = "/registerAnEndpoint")
+    public void registerEndPoint(@RequestBody RegisterEndPointUOI registerEndPointUOI) {
+        cirdaxProfileService.registerEndPoint(registerEndPointUOI);
     }
 
 }

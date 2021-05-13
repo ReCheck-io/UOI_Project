@@ -3,15 +3,15 @@ spring:
   neo4j:
     username: neo4j
     password: test
-# jpa:
-#   hibernate:
-#     ddl-auto: update
-#     show-sql: true
-# datasource:
-#  driver-class-name: com.mysql.cj.jdbc.Driver
-#  url: jdbc:mysql://localhost:3306/uoi_backend
-#  username: Dakata
-#  password: test
+ jpa:
+   hibernate:
+     ddl-auto: update
+     show-sql: true
+ datasource:
+   driver-class-name: com.mysql.cj.jdbc.Driver
+   url: jdbc:mysql://localhost:3306/externalsystems
+   username: app_dev_loc
+   password: app_dev_loc_opx07
 
 springdoc:
  api-docs:

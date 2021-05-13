@@ -118,12 +118,6 @@ public class UOIController {
         service.requestAccess(requestAccessDTO);
     }
 
-    @Tag(name = "Test")
-    @PutMapping(path = "/registerAnEndpoint")
-    public void registerEndPoint(@RequestBody RegisterEndPointUOI registerEndPointUOI) {
-        service.registerEndPoint(registerEndPointUOI);
-    }
-
     @Tag(name = "ExternalSystemAccess")
     @GetMapping(path = "/requestToken")
     public Object testRequest(@RequestParam(value = "uoi") String uoi,
