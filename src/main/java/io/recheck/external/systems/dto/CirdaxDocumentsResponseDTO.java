@@ -11,5 +11,6 @@ public class CirdaxDocumentsResponseDTO {
 
     private String accessTokenState;
     private List<CirdaxDocumentsDTO> cirdaxDocumentsDTOList;
+    private String rawResponse;
 
 }
