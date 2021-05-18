@@ -1,4 +1,6 @@
 spring:
+ profiles:
+   active: '@spring.profile@'
  data:
   neo4j:
     username: neo4j
@@ -7,11 +9,6 @@ spring:
    hibernate:
      ddl-auto: update
      show-sql: true
- datasource:
-   driver-class-name: com.mysql.cj.jdbc.Driver
-   url: jdbc:mysql://localhost:3306/externalsystems
-   username: app_dev_loc
-   password: app_dev_loc_opx07
 
 springdoc:
  api-docs:

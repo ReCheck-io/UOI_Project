@@ -87,4 +87,37 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>local</id>
+            <properties>
+                <spring.profile>local</spring.profile>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>default</id>
+            <properties>
+                <spring.profile>local</spring.profile>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+
+        <profile>
+            <id>develop</id>
+            <properties>
+                <spring.profile>develop</spring.profile>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>production</id>
+            <properties>
+                <spring.profile>production</spring.profile>
+            </properties>
+        </profile>
+    </profiles>
+
 </project>
