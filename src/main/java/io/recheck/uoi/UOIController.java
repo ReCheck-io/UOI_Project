@@ -4,7 +4,6 @@ package io.recheck.uoi;
 import io.recheck.uoi.dto.*;
 import io.recheck.uoi.entity.LEVEL;
 import io.recheck.uoi.entity.UOINode;
-import io.recheck.uoi.exceptionhandler.RestExceptionHandler;
 import io.recheck.uoi.exceptions.NodeNotFoundException;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 @Slf4j
@@ -21,13 +19,7 @@ import java.util.ArrayList;
 public class UOIController {
 
     @Autowired
-    RestExceptionHandler restExceptionHandler;
-
-    @Autowired
     UOIRepository uoiRepository;
-
-//    @Autowired
-//    SystemsRepository systemsRepository;
 
     @Autowired
     UOIService service;
@@ -111,80 +103,13 @@ public class UOIController {
         return service.setNodeOwner(setNodeOwnerDTO);
     }
 
-    @Operation(summary = "The system and user are going to be sent to an external system to retrieve information.")
-    @Tag(name = "Requests for token")
-    @PostMapping(path = "/uoi")
-    public void requestAccess(@RequestBody RequestAccessDTO requestAccessDTO) {
-        service.requestAccess(requestAccessDTO);
-    }
-
-    @Tag(name = "ExternalSystemAccess")
-    @GetMapping(path = "/requestToken")
-    public Object testRequest(@RequestParam(value = "uoi") String uoi,
-                              @RequestParam(value = "systemId") String systemId,
-                              @RequestParam(value = "userId") String userId) {
-        return service.requestToken(new RequestAccessDTO(uoi, systemId, userId));
-    }
-
-    @Tag(name = "ExternalSystemAccess")
-    @GetMapping(path = "/checkToken")
-    public Object checkRequest(@RequestParam(value = "uoi") String uoi,
-                               @RequestParam(value = "userId") String userId,
-                               @RequestParam(value = "token") String token) {
-        return service.checkToken(new CheckTokenDTO(uoi, userId, token));
-    }
-
-
-    @Tag(name = "ExternalSystemAccess")
-    @GetMapping(path = "/queryDocuments")
-    public Object testRequestDocuments(@RequestParam(value = "uoi") String uoi,
-                                       @RequestParam(value = "token") String token) {
-        return service.queryForDocuments(new AccessTokenDTO(uoi, token));
-    }
-
-    @Tag(name = "Test")
-    @GetMapping(path = "/querySingleDocument")
-    public void testRequestSigleDocument() {
-        service.queryForSingleDocument(new GetDocumentDTO("uoi", "token", "document"));
-    }
-//    @GetMapping("/demoNodes")
-//    public String executeDemoNode() {
-//        uoiRepository.deleteAll();
-//        service.demoNodes(uoiRepository);
-//        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503104983629824/Untitled_Diagram1.png'/> " +
-//                "</body></html>";
-//    }
-//
-//    @GetMapping("/scenarioCombine")
-//    public String executeDemoNodeCombineTwoRooms() {
-//        uoiRepository.deleteAll();
-//        service.demoNodesCombineTwoRooms(uoiRepository);
-//        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503102551064576/Untitled_Diagram3.png'/> " +
-//                "</body></html>";
-//    }
-
-    @Hidden
-    @GetMapping("/clearDB")
-    public String clearDB() {
-        uoiRepository.deleteAll();
-        return "DB has been cleared!";
-    }
-
     @Hidden
     @GetMapping("/")
-    public String error() {
+    public String home() {
         return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/675683560673509389/776827370161700874/addtext_com_MTAwMTI1MzExODY.jpg'/> " +
                 "</body></html>";
 
     }
-
-//    @GetMapping("/scenarioAddANewRoom")
-//    public String executeDemoNodeAddANewRoom() {
-//        uoiRepository.deleteAll();
-//        service.demoNodesAddANewRoom(uoiRepository);
-//        return "<html><body>" + "<img src='https://cdn.discordapp.com/attachments/709719423094751313/777503092572553226/Untitled_Diagram4.png'/> " +
-//                "</body></html>";
-//    }
 
 
 }
