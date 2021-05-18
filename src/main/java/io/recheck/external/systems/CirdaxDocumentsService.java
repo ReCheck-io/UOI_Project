@@ -5,14 +5,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.recheck.external.systems.dto.CirdaxDocumentsDTO;
-import io.recheck.external.systems.dto.CirdaxDocumentsRequestAccessDTO;
-import io.recheck.external.systems.dto.CirdaxDocumentsResponseDTO;
+import io.recheck.external.systems.dto.*;
 import io.recheck.external.systems.entity.CirdaxResourcesEnum;
 import io.recheck.external.systems.entity.CirdaxResourcesParams;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Collections;
@@ -31,37 +30,42 @@ public class CirdaxDocumentsService {
         this.cirdaxProfileService = cirdaxProfileService;
     }
 
-    public CirdaxDocumentsResponseDTO requestAccessAndQueryDocuments(CirdaxDocumentsRequestAccessDTO dto) {
+    public CirdaxResponseWrapperDTO requestAccessAndQueryDocuments(CirdaxAccessRequestDTO dto) {
+        CirdaxAccessResponseDTO cirdaxAccessResponseDTO = requestAccess(dto);
+        if (StringUtils.hasText(cirdaxAccessResponseDTO.getToken())) {
+            return new CirdaxResponseWrapperDTO(queryDocuments(dto.getUoi(), cirdaxAccessResponseDTO.getToken()));
+        }
+        else {
+            return new CirdaxResponseWrapperDTO(cirdaxAccessResponseDTO);
+        }
+    }
 
+    private CirdaxAccessResponseDTO requestAccess(CirdaxAccessRequestDTO dto) {
         String addressForRequestToken = getAddressForRequestToken(dto.getUoi(), dto.getRequestorCode(), dto.getRequestorName());
 
-        log.info("Send GET {}", addressForRequestToken);
         ResponseEntity<String> responseEntityToken = restClientService.get(addressForRequestToken);
-        log.info("Receive {}", responseEntityToken);
+        String requestAccessBody = responseEntityToken.getBody();
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            Map<String, String> responseEntityTokenMap = objectMapper.readValue(responseEntityToken.getBody(), new TypeReference<Map<String, String>>() {});
+            Map<String, String> responseEntityTokenMap = objectMapper.readValue(requestAccessBody, new TypeReference<Map<String, String>>() {});
             if (responseEntityTokenMap.containsKey(CirdaxResourcesParams.UoiAccessTokenHash.name())) {
                 String token = responseEntityTokenMap.get(CirdaxResourcesParams.UoiAccessTokenHash.name());
-                return queryDocuments(dto.getUoi(), token);
+                return new CirdaxAccessResponseDTO(token, "");
             }
             else {
-                return new CirdaxDocumentsResponseDTO("", Collections.emptyList(), responseEntityToken.getBody());
+                return new CirdaxAccessResponseDTO("", requestAccessBody);
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            return new CirdaxDocumentsResponseDTO("", Collections.emptyList(), responseEntityToken.getBody());
+            return new CirdaxAccessResponseDTO("", requestAccessBody);
         }
-
     }
 
     private CirdaxDocumentsResponseDTO queryDocuments(String uoi, String token) {
         String addressForQueryDocuments = getAddressForQueryDocuments(uoi, token);
 
-        log.info("Send GET {}", addressForQueryDocuments);
         ResponseEntity<String> responseEntityDocuments = restClientService.get(addressForQueryDocuments);
-        log.info("Receive {}", responseEntityDocuments);
         String documentsBody = responseEntityDocuments.getBody();
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -70,17 +74,9 @@ public class CirdaxDocumentsService {
         try {
             List<CirdaxDocumentsDTO> cirdaxDocumentsDTOS = objectMapper.readValue(documentsBody, new TypeReference<List<CirdaxDocumentsDTO>>() {});
             cirdaxDocumentsDTOS.forEach(c -> c.setDeepLinkUrl(getAddressForDocuments(c.getDeepLinkUrl(), uoi, token, c.getDocumentId())));
-            return new CirdaxDocumentsResponseDTO(null, cirdaxDocumentsDTOS, "");
-        } catch (JsonParseException e) {
-            return new CirdaxDocumentsResponseDTO("", Collections.emptyList(), documentsBody);
+            return new CirdaxDocumentsResponseDTO(cirdaxDocumentsDTOS, "");
         } catch (JsonProcessingException e) {
-
-            try {
-                Map<String, Object> responseEntityDocumentsMap = objectMapper.readValue(documentsBody, new TypeReference<Map<String, Object>>() {});
-                return new CirdaxDocumentsResponseDTO(responseEntityDocumentsMap.get(CirdaxResourcesParams.AccessTokenState.name()).toString(), Collections.emptyList(), "");
-            } catch (JsonProcessingException ex) {
-                return new CirdaxDocumentsResponseDTO("", Collections.emptyList(), documentsBody);
-            }
+            return new CirdaxDocumentsResponseDTO(Collections.emptyList(), documentsBody);
         }
     }
 
@@ -107,11 +103,6 @@ public class CirdaxDocumentsService {
         builder.replaceQueryParam(CirdaxResourcesParams.UoiAccessToken.name(), accessToken);
 
         return builder.toUriString();
-    }
-
-    private String getAddressForDocuments(String uoi, String accessToken, String documentId) {
-        Map<CirdaxResourcesEnum, String> map = cirdaxProfileService.getCirdaxResourcesMap();
-        return getAddressForDocuments(map.get(CirdaxResourcesEnum.GetUoiDocument), uoi, accessToken, documentId);
     }
 
     private String getAddressForDocuments(String httpUrl, String uoi, String accessToken, String documentId) {

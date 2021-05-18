@@ -1,7 +1,7 @@
 package io.recheck.external.systems;
 
-import io.recheck.external.systems.dto.CirdaxDocumentsRequestAccessDTO;
-import io.recheck.external.systems.dto.CirdaxDocumentsResponseDTO;
+import io.recheck.external.systems.dto.CirdaxAccessRequestDTO;
+import io.recheck.external.systems.dto.CirdaxResponseWrapperDTO;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +18,7 @@ public class CirdaxDocumentsController {
     }
 
     @PostMapping(path = "/documents/cirdax", consumes = "application/json", produces = "application/json")
-    public CirdaxDocumentsResponseDTO requestAccessAndQueryDocuments(@RequestBody @Valid CirdaxDocumentsRequestAccessDTO dto) {
+    public CirdaxResponseWrapperDTO requestAccessAndQueryDocuments(@RequestBody @Valid CirdaxAccessRequestDTO dto) {
         return cirdaxDocumentsService.requestAccessAndQueryDocuments(dto);
     }
 
