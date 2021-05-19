@@ -2,68 +2,83 @@ package io.recheck.uoi.exceptionhandler;
 
 import io.recheck.uoi.exceptions.NodeNotFoundException;
 import io.recheck.uoi.exceptions.ValidationErrorException;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-@Order(Ordered.HIGHEST_PRECEDENCE)
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Slf4j
 @ControllerAdvice
-public class RestExceptionHandler extends ResponseEntityExceptionHandler {
-
-    @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
-                                                                  HttpHeaders headers,
-                                                                  HttpStatus status,
-                                                                  WebRequest request) {
-        String error = "Malformed JSON request";
-        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, error, ex));
-    }
+public class RestExceptionHandler {
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
 
-    @ExceptionHandler(NodeNotFoundException.class)
-    public ResponseEntity<Object> handleNNFError(Exception ex) {
-        logger.error("", ex);
-        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
-        apiError.setMessage(String.format("This node is not existing in the database."));
-        apiError.setDebugMessage(ex.getMessage());
-        return buildResponseEntity(apiError);
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGeneralError(Exception ex) {
-        logger.error("", ex);
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
-        apiError.setMessage(String.format("Something went wrong, see the debug message for more."));
-        ex.printStackTrace();
-        apiError.setDebugMessage(ex.getLocalizedMessage());
+        log.error("", ex);
+        ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong, see the debug message for more.");
         return buildResponseEntity(apiError);
     }
 
-    @ExceptionHandler(ValidationErrorException.class)
+    @ExceptionHandler(NodeNotFoundException.class)
+    public ResponseEntity<Object> handleNNFError(Exception ex) {
+        log.error("", ex);
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND, "This node is not existing in the database.");
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler( {
+            ValidationErrorException.class,
+            IllegalArgumentException.class
+    })
     public ResponseEntity<Object> handleValidationError(Exception ex) {
-        logger.error("", ex);
-        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE);
-        apiError.setMessage("A validation error has been encountered.");
-        apiError.setDebugMessage(ex.getLocalizedMessage());
+        log.error("", ex);
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE, "A validation error has been encountered.");
         return buildResponseEntity(apiError);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Object> handleIllegalArgumentError(Exception ex) {
-        logger.error("", ex);
-        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE);
-        apiError.setMessage("A validation error has been encountered.");
-        apiError.setDebugMessage(ex.getLocalizedMessage());
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<Object> handleBindException(BindException ex) {
+        log.error("", ex);
+
+        StringBuilder message = new StringBuilder();
+
+        List<ObjectError> globalErrors = ex.getBindingResult().getGlobalErrors();
+        List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+        Set<String> fieldsSet = fieldErrors.stream()
+                .map(violation -> violation.getField() + ": " + violation.getDefaultMessage())
+                .collect(Collectors.toSet());
+        Set<String> globalSet = globalErrors.stream()
+                .map(violation -> violation.getObjectName() + ": " + violation.getDefaultMessage())
+                .collect(Collectors.toSet());
+
+        message.append("Argument Not Valid:");
+        if (!globalSet.isEmpty()) {
+            for (String violation : globalSet) {
+                message.append(" ");
+                message.append(violation);
+                message.append(";");
+            }
+        }
+        if (!fieldsSet.isEmpty()) {
+            for (String violation : fieldsSet) {
+                message.append(" ");
+                message.append(violation);
+                message.append(";");
+            }
+        }
+
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE, message.toString());
         return buildResponseEntity(apiError);
     }
 
