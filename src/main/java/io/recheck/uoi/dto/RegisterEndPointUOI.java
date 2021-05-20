@@ -1,5 +1,6 @@
 package io.recheck.uoi.dto;
 
+import io.recheck.external.systems.entity.CirdaxResourcesEnum;
 import lombok.Data;
 
 @Data
@@ -7,7 +8,7 @@ public class RegisterEndPointUOI {
 
     private String system;
     private String url;
-    private String type;
+    private CirdaxResourcesEnum type;
 
     public RegisterEndPointUOI(){
         this.system = system;

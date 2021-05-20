@@ -41,7 +41,7 @@ public class CirdaxProfileService {
     public void registerEndPoint(RegisterEndPointUOI registerEndPointUOI) {
         CirdaxProfile cirdaxProfile = findOrCreate();
 
-        CirdaxResourcesEnum cirdaxResourcesEnumVal = CirdaxResourcesEnum.valueOf(registerEndPointUOI.getType());
+        CirdaxResourcesEnum cirdaxResourcesEnumVal = registerEndPointUOI.getType();
         cirdaxProfile.getResources().put(cirdaxResourcesEnumVal, registerEndPointUOI.getUrl());
 
         cirdaxProfileRepository.save(cirdaxProfile);
