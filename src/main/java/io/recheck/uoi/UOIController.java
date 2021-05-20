@@ -64,13 +64,6 @@ public class UOIController {
         return service.makeRelationship(uoiRelationshipDTO);
     }
 
-
-    @PostMapping(path = "/newWithInformation", consumes = "application/json", produces = "application/json")
-    public UOINode addMember(@RequestBody UOINode uoiNode) {
-        uoiRepository.save(uoiNode);
-        return uoiNode;
-    }
-
     @Operation(summary = "Search for UOIs that are owned by user:")
     @Tag(name = "Search")
     @GetMapping(path = "/search/owner")
