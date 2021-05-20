@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 
 @Slf4j
@@ -27,12 +28,8 @@ public class UOIController {
     @Operation(summary = "Creating a new basic UOI without metadata.")
     @Tag(name = "Create")
     @GetMapping("/new")
-    public UOINode generateNewUOI(@RequestParam(value = "countryCode", defaultValue = "NL") String countryCode,
-                                  @RequestParam(value = "level", defaultValue = "ROOM") LEVEL level,
-                                  @RequestParam(value = "owner", required = false) String owner,
-                                  @RequestParam(value = "uoiClass", required = false) String uoiClass,
-                                  @RequestParam(value = "parentUOI", required = false) String parentUOI) throws Exception {
-        return service.generateNewUOI(new NewUOIDTO(countryCode, level, owner, uoiClass, parentUOI));
+    public UOINode generateNewUOI(@Valid NewUOIDTO newUOIDTO) throws Exception {
+        return service.generateNewUOI(newUOIDTO);
     }
 
     @Operation(summary = "Search for a UOI node.")

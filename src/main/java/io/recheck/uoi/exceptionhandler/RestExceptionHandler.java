@@ -1,7 +1,7 @@
 package io.recheck.uoi.exceptionhandler;
 
+import io.recheck.uoi.exceptions.EnumConversionFailedException;
 import io.recheck.uoi.exceptions.NodeNotFoundException;
-import io.recheck.uoi.exceptions.ValidationErrorException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,16 +12,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
 @ControllerAdvice
 public class RestExceptionHandler {
-
-    private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
-        return new ResponseEntity<>(apiError, apiError.getStatus());
-    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGeneralError(Exception ex) {
@@ -37,50 +33,46 @@ public class RestExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
-    @ExceptionHandler( {
-            ValidationErrorException.class,
-            IllegalArgumentException.class
-    })
-    public ResponseEntity<Object> handleValidationError(Exception ex) {
-        log.error("", ex);
-        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE, "A validation error has been encountered.");
-        return buildResponseEntity(apiError);
-    }
-
     @ExceptionHandler(BindException.class)
     public ResponseEntity<Object> handleBindException(BindException ex) {
         log.error("", ex);
 
-        StringBuilder message = new StringBuilder();
-
         List<ObjectError> globalErrors = ex.getBindingResult().getGlobalErrors();
         List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
-        Set<String> fieldsSet = fieldErrors.stream()
-                .map(violation -> violation.getField() + ": " + violation.getDefaultMessage())
-                .collect(Collectors.toSet());
-        Set<String> globalSet = globalErrors.stream()
-                .map(violation -> violation.getObjectName() + ": " + violation.getDefaultMessage())
-                .collect(Collectors.toSet());
+        List<ApiValidationError> fieldsSet = fieldErrors.stream()
+                .map(violation -> {
+                    String violationMessage = violation.getDefaultMessage();
+                    if (violation.contains(Exception.class)) {
+                        Exception nestedException = violation.unwrap(Exception.class);
+                        Throwable rootCause = findCauseRootCause(nestedException);
+                        if (rootCause instanceof EnumConversionFailedException) {
+                            violationMessage = rootCause.getMessage();
+                        }
+                    }
+                    return new ApiValidationError(violation.getField(), violationMessage);
+                })
+                .collect(Collectors.toList());
+        List<ApiValidationError> globalSet = globalErrors.stream()
+                .map(violation -> new ApiValidationError(violation.getObjectName(), violation.getDefaultMessage()))
+                .collect(Collectors.toList());
 
-        message.append("Argument Not Valid:");
-        if (!globalSet.isEmpty()) {
-            for (String violation : globalSet) {
-                message.append(" ");
-                message.append(violation);
-                message.append(";");
-            }
-        }
-        if (!fieldsSet.isEmpty()) {
-            for (String violation : fieldsSet) {
-                message.append(" ");
-                message.append(violation);
-                message.append(";");
-            }
-        }
+        fieldsSet.addAll(globalSet);
 
-        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE, message.toString());
+
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE, "Argument(s) Not Valid", fieldsSet);
         return buildResponseEntity(apiError);
     }
 
+    private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
+        return new ResponseEntity<>(apiError, apiError.getStatus());
+    }
 
+    private Throwable findCauseRootCause(Throwable throwable) {
+        Objects.requireNonNull(throwable);
+        Throwable rootCause = throwable;
+        while (rootCause.getCause() != null && rootCause.getCause() != rootCause) {
+            rootCause = rootCause.getCause();
+        }
+        return rootCause;
+    }
 }
