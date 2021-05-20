@@ -18,7 +18,7 @@ public class CountryValidator implements ConstraintValidator<CountryConstraint, 
         if (!StringUtils.hasText(country)) {
             return true;
         }
-        return ISO_COUNTRIES.contains(country);
+        return ISO_COUNTRIES.contains(country.toUpperCase());
     }
 
 }

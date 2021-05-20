@@ -1,14 +1,15 @@
 package io.recheck.uoi;
 
 import io.recheck.uoi.dto.*;
+import io.recheck.uoi.entity.UOINode;
 import io.recheck.uoi.exceptions.NodeNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import io.recheck.uoi.entity.UOINode;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -23,7 +24,7 @@ public class UOIService {
         if (StringUtils.hasText(newUOIDTO.getParentUOI())) {
             try {
                 UOINode parentNode = uoiRepository.findByUoi(newUOIDTO.getParentUOI());
-                node = new UOINode(newUOIDTO.getCountryCode(), newUOIDTO.getLevel(), newUOIDTO.getOwner(), newUOIDTO.getUoiClass());
+                node = new UOINode(newUOIDTO.getCountryCode().toUpperCase(), newUOIDTO.getLevel(), newUOIDTO.getOwner(), newUOIDTO.getUoiClass());
                 uoiRepository.save(node);
                 node.partOf(parentNode);
                 uoiRepository.save(node);
@@ -37,7 +38,7 @@ public class UOIService {
                 throw new NodeNotFoundException();
             }
         } else {
-            node = new UOINode(newUOIDTO.getCountryCode(), newUOIDTO.getLevel(), newUOIDTO.getOwner(), newUOIDTO.getUoiClass());
+            node = new UOINode(newUOIDTO.getCountryCode().toUpperCase(), newUOIDTO.getLevel(), newUOIDTO.getOwner(), newUOIDTO.getUoiClass());
         }
         System.out.println(node.toString());
         uoiRepository.save(node);

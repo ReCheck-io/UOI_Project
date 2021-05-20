@@ -1,13 +1,14 @@
 package io.recheck.uoi.exceptionhandler;
 
-import io.recheck.uoi.exceptions.EnumConversionFailedException;
 import io.recheck.uoi.exceptions.NodeNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -36,31 +37,29 @@ public class RestExceptionHandler {
     @ExceptionHandler(BindException.class)
     public ResponseEntity<Object> handleBindException(BindException ex) {
         log.error("", ex);
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE, "Argument(s) Not Valid", getBindError(ex.getBindingResult()));
+        return buildResponseEntity(apiError);
+    }
 
-        List<ObjectError> globalErrors = ex.getBindingResult().getGlobalErrors();
-        List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        log.error("", ex);
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE, "Argument(s) Not Valid", getBindError(ex.getBindingResult()));
+        return buildResponseEntity(apiError);
+    }
+
+    private List<ApiValidationError> getBindError(BindingResult bindingResult) {
+        List<ObjectError> globalErrors = bindingResult.getGlobalErrors();
+        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
         List<ApiValidationError> fieldsSet = fieldErrors.stream()
-                .map(violation -> {
-                    String violationMessage = violation.getDefaultMessage();
-                    if (violation.contains(Exception.class)) {
-                        Exception nestedException = violation.unwrap(Exception.class);
-                        Throwable rootCause = findCauseRootCause(nestedException);
-                        if (rootCause instanceof EnumConversionFailedException) {
-                            violationMessage = rootCause.getMessage();
-                        }
-                    }
-                    return new ApiValidationError(violation.getField(), violationMessage);
-                })
+                .map(violation -> new ApiValidationError(violation.getField(), violation.getDefaultMessage()))
                 .collect(Collectors.toList());
         List<ApiValidationError> globalSet = globalErrors.stream()
                 .map(violation -> new ApiValidationError(violation.getObjectName(), violation.getDefaultMessage()))
                 .collect(Collectors.toList());
 
         fieldsSet.addAll(globalSet);
-
-
-        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE, "Argument(s) Not Valid", fieldsSet);
-        return buildResponseEntity(apiError);
+        return fieldsSet;
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
